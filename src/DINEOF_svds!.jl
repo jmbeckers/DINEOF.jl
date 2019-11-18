@@ -1,3 +1,41 @@
+"""
+
+
+    U,S,V,=DINEOF_svds!()
+
+# DINEOF SVD decomposition with filling in of missing points.
+
+
+# Input: 
+* `X`: a two-dimensional array of size MxN with N<=M already filled in with a first guess in points with missing values
+
+* `missingvalues`: array of size Px2 collecting the indexes for the P missing values in location missingvalues[:,1] and missingvalues[:,2]. There is no distinction between missing values and topologically excludes points. All will be filled
+
+* `crossvalidation`:  array of size Qx2 collecting the indexes for the Q points to be used for cross validation
+
+* `keeprestart`: Boolean. If true the method keeps track of the best reconstruction up to now while doing further iterations. 
+
+* `ncmax`: maximum number of eigenvalues calculated
+
+* `itstart` : defines the number of modes used during the first iteration. Then one at a time is added
+
+* `dineofmaxiter` : Maximum number of iterations during a SVD decomposition/filling in loop
+
+* `dineoftol`: Defines the tolerance below which the iterations are stopped. Relative change of xxxxx
+
+For the other parameters, see DINEOF_svd
+
+
+
+# Output:
+
+* `U,S,V`: the filled SVD decomposition such that in the infiltered version U*S*V' is the best approximation of X with nele singular vectors.
+
+* WARNING: X is updated at the missing data points !!!!!!
+
+
+
+"""
 function DINEOF_svds!(X,
 	missingvalues,
 	crossvalidation;
@@ -9,8 +47,8 @@ function DINEOF_svds!(X,
 	svdmeth="svd",
 	svdtol=0.000001,
 	filter="None",
-	filterintensity="1.0",
-	filterrepetitions="1"
+	filterintensity=1.0,
+	filterrepetitions=1
 	)
     # X array to analyze size MxN with M>N
     # missingvalues array of indexes to missing points (P,2)
@@ -80,7 +118,8 @@ function DINEOF_svds!(X,
         # NEED TO ADD A CONVERGENCE LOOP FOR FIXED NUMBER OF EOF. 
         
         for iterc=1:dineofmaxiter
-            
+            @show svdmeth,filter,filterintensity
+			
             SVU,SVS,SVV,ncon,nit=DINEOF_svd(X,min(iloop,ncmax),svdmeth,svdtol;filter=filter,filterintensity=filterintensity,filterrepetitions=filterrepetitions)
             
             

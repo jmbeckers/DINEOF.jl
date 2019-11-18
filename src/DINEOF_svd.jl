@@ -11,7 +11,7 @@
 
 * `nele`: the number of singular vectors and values asked for (<=N)
 
-* `svdmeth`: if `svd` uses SVD decomposition, if `eig` uses eigenvalue approach on X'*X. Results should be identical but CPU demand could be different
+* `svdmeth`: if `svd` uses SVD decomposition, if `eig` uses eigenvalue approach on X'X. Results should be identical but CPU demand could be different
 
 * `svdtol`: tolerance for convergence criteria during SVD decomposition
 
@@ -19,7 +19,7 @@
 
 "None" : no filter applied
 "vpmf" : Very poor mans filter: applies a postprocessing filter to V and adapts U and S to get an orthonormal base. It is NOT the best approximation of X or the filtered X
-"pmf" : poor mans filter: applies a preprocessing filter on X (or X'*X which mathematically is identical). U*S*V' is the best approximation to the filtered X
+"pmf" : poor mans filter: applies a preprocessing filter on X (or X'X which mathematically is identical). USV' is the best approximation to the filtered X
 
 For the two filters a diffusion-like filter is applied. filterintensity=1 is the strongest filter that should be used and amounts to a 0.25,0.5,0.25 filter stencil.
 filterrepetitions defines how many diffusion-like steps are used (so how wide the filter stencil becomes)
@@ -28,15 +28,13 @@ filterrepetitions defines how many diffusion-like steps are used (so how wide th
 
 # Output:
 
-* `U,S,V`: the SVD decomposition such that in the infiltered version U*S*V' is the best approximation of X with nele singular vectors.
+* `U,S,V`: the SVD decomposition such that in the infiltered version USV' is the best approximation of X with nele singular vectors.
 
 * `ncon` : number of converged singular values, should be equal to nele
 
 * `nit` : number of iterations needed to find the singular values (can be used to adapt tolerance svdtol)
 
 """
-
-
 function DINEOF_svd(X,nele,svdmeth="svd",svdtol=0.00001;filter="None",filterintensity=1.0,filterrepetitions=1)
     
     

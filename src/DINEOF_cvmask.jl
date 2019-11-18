@@ -1,6 +1,29 @@
+"""
 
 
+    cvmask=DINEOF_cvmask(X,coverage=0.01;cvmethod="Random",maxbubblesize=0.01*[size(X)...],dimensionsforcopy=[],maximumiterations=1000)
 
+# Using the data array X, create a cross validation mask of same size. 
+
+
+# Input: 
+* `X`: an N-dimensional array of data where missing values are NaN
+
+* `coverage` : fraction of points to be used for cross validation (NaN points in X are not taken into account in this coverage estimate and cvmask will never be true on a NaN point of X)
+
+* `cvmethod`: optional keyword argument. Current options are "Random", "Bubbles" or "CopyMask". "Random" just adds single points; "Bubbles" adds ellipsoides with maximum axes length defined in maxbubblesize. "CopyMask" takes a slive of X and uses the NaNs in this slice to create a slice of cvmask in another location. The dimension along which the slice is moves/copied is defined in array dimensionsforcopy.
+
+* `maxbubblesize`: array which for each dimension contains the maximum size of the bubble ellipsoide
+
+* `dimensionsforcopy`: array of boolens which for each dimensions tells whether or not a mask from NaN in X can be copied.
+
+* `maximumiterations` : saveguard for option "CopyMask" which is not ensured to reach the requested `coverage`.
+
+# Output:
+
+* `cvmask`: boolean array of the same size as input array X with "true" on points to be used for cross-valitation
+
+"""
 function DINEOF_cvmask(X,coverage=0.01;cvmethod="Random",maxbubblesize=0.01*[size(X)...],dimensionsforcopy=[],maximumiterations=1000)
 
     # Creates cross validation points for the ND-array X
@@ -23,7 +46,7 @@ function DINEOF_cvmask(X,coverage=0.01;cvmethod="Random",maxbubblesize=0.01*[siz
     cvpoints=Int(ceil(coverage*sum(.!isnan.(X))))
     
     cvdone=0
-    @show cvpoints
+    #@show cvpoints
     if cvmethod=="Random"
         batchsize=Int(ceil(0.1*cvpoints))
         @show batchsize
@@ -41,14 +64,14 @@ function DINEOF_cvmask(X,coverage=0.01;cvmethod="Random",maxbubblesize=0.01*[siz
     end
     
     if cvmethod=="Bubbles"
-        @show maxbubblesize     
+        #@show maxbubblesize     
         # For the moment  implemented as ellipsoides 
         #bsize=Int(ceil(sum(maxbubblesize)/size(bubblesize)[1]/2))
         #@show bsize
         Ifirst, Ilast = CartesianIndices(X)[1], CartesianIndices(X)[M]
-        @show Ifirst,Ilast
+        #@show Ifirst,Ilast
         I1 = oneunit(Ifirst)
-        @show I1
+        #@show I1
         while cvdone<cvpoints
             position=mod(rand(Int),M)+1
             #@show CartesianIndices(X)[position]
@@ -62,7 +85,7 @@ function DINEOF_cvmask(X,coverage=0.01;cvmethod="Random",maxbubblesize=0.01*[siz
             bubbles[bubbles.<0.5].=0.5
             # Check in the cube of largest coverage
             bsize=Int(ceil(maximum(bubbles)))
-            @show bubbles
+            #@show bubbles
     
             for J in max(Ifirst, I-bsize*I1):min(Ilast, I+bsize*I1)
                 # and check if the point false into the ellipsoide
@@ -95,7 +118,7 @@ function DINEOF_cvmask(X,coverage=0.01;cvmethod="Random",maxbubblesize=0.01*[siz
         groups=dimensionsforcopy
 
         n=ndims(X)
-        @show n
+        #@show n
         ntimes=0
         while cvdone<cvpoints
             myf=rand(Int,n)
