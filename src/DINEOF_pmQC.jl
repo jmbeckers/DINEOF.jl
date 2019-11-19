@@ -18,9 +18,11 @@ M=prod(size(X))
     OO=zeros(Float64,size(X))
     OO[validpoints]=abs.(o.-om)./del
     
+	@show "second"
 	# will contain the number of neighbors with NaN
 	OO2=zeros(Float64,size(X))
 	Ifirst, Ilast = CartesianIndices(X)[1], CartesianIndices(X)[M]
+	@show Ilast
     I1 = oneunit(Ifirst)
 	for I in CartesianIndices(X)
 	    
@@ -38,7 +40,7 @@ M=prod(size(X))
 	
 	
 	
-	
+	@show "third"
 	
 	OO3=zeros(Float64,size(X))
 	
@@ -46,6 +48,7 @@ M=prod(size(X))
 	
 	
 	Ifirst, Ilast = CartesianIndices(X)[1], CartesianIndices(X)[M]
+	@show Ilast
     I1 = oneunit(Ifirst)
 	for I in CartesianIndices(X)
 	     values=zeros(Float64,boxsize)

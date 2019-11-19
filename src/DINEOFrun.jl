@@ -1,13 +1,13 @@
 """
 
 
-       DINEOFrun(X,whichgroups;minimumcoverage=(0.1, 0.1),cvmask="Automatic",cvfraction=0.01,cvmethod="Random",errormap="true",musquare=0)
+       DINEOFrun(X,whichgroups;minimumcoverage=(0.1, 0.1),cvmask="Automatic",cvfraction=0.01,cvmethod="Random",errormap=true,musquare=0)
 
 
 
 
 """
-function DINEOFrun(X,whichgroups;minimumcoverage=(0.1, 0.1),cvmask="Automatic",cvfraction=0.01,cvmethod="Random",errormap="true",musquare=0)
+function DINEOFrun(X,whichgroups;minimumcoverage=(0.1, 0.1),cvmask="Automatic",cvfraction=0.01,cvmethod="Random",errormap=true,musquare=0)
     # X ND array with NaN at missing locations
     # whichgroups: array of 1 and 2 indicating which dimensions are collapsed together. eg [1 2 1 2] regroups dimensions 
     # 1 and 3 into i direction and 2 with 4 into j direction
@@ -227,7 +227,7 @@ function DINEOFrun(X,whichgroups;minimumcoverage=(0.1, 0.1),cvmask="Automatic",c
     end
     @show size(UG[1][1])
 	if errormap
-	errormap=permutedims(reshape(errmap ,sizeperminput),sortperm(perminput))
+	errmap=permutedims(reshape(errmap ,sizeperminput),sortperm(perminput))
 	end
     
     return X,permutedims(reshape(XF2D ,sizeperminput),sortperm(perminput)),UG,S,VG,cva,cvb,errmap,musquare
