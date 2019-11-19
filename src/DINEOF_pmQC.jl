@@ -1,4 +1,4 @@
-function DINEOF_pmQC(X,XA,errmap,musquare,ws)
+function DINEOF_pmQC(X,XA,errmap,musquare,ws;weights=[1.0,1.0,1.0])
 
 # poor mans quality check. Here XA is the EOF filtered field. Normally for consistency the OI-EOF analysed field should be used 
 # error maps is variance of error
@@ -7,8 +7,19 @@ function DINEOF_pmQC(X,XA,errmap,musquare,ws)
 validpoints=.!isnan.(X)
 M=prod(size(X))
 
+if errmap==[]
+weights[1]=0.0
+end
+
+OO=0.
+OO2=0.
+OO3=0.
+
+weights=weights/sum(weights)
+
     @show size(X[validpoints])
 
+    if weights[1]>0
     o=abs.(X[validpoints].-XA[validpoints])./sqrt.(max.(musquare.-errmap[validpoints],1E-10*musquare))
 
     om=median(o)
@@ -17,7 +28,9 @@ M=prod(size(X))
     
     OO=zeros(Float64,size(X))
     OO[validpoints]=abs.(o.-om)./del
+	end
     
+	if weights[2]>0
 	@show "second"
 	# will contain the number of neighbors with NaN
 	OO2=zeros(Float64,size(X))
@@ -37,11 +50,11 @@ M=prod(size(X))
 		
 		
 	end
-	
+	end
 	
 	
 	@show "third"
-	
+	if weights[3]>0
 	OO3=zeros(Float64,size(X))
 	
 	boxsize=(ws*2+1)^ndims(X)
@@ -74,11 +87,12 @@ M=prod(size(X))
 		end
 		
 	end
-	@show OO
-	@show OO2
-	@show OO3
+	end
+	#@show OO
+	#@show OO2
+	#@show OO3
 	
-    return OO.+OO2.+OO3
+    return weights[1]*OO .+ weights[2]*OO2 .+ weights[3]*OO3
 
 end
 
