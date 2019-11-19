@@ -20,6 +20,9 @@ export DINEOF_musquare
 include("DINEOF_cvmask.jl")
 export DINEOF_cvmask
 
+include("DINEOF_pmQC.jl")
+export DINEOF_pmQC
+
 include("DINEOFrun.jl")
 export DINEOFrun
 
