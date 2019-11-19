@@ -26,4 +26,10 @@ export DINEOF_pmQC
 include("DINEOFrun.jl")
 export DINEOFrun
 
+include("DINEOF_fuse!.jl")
+export DINEOF_fuse!
+
+include("DIVAnd_filter3.jl")
+export DIVAnd_filter3
+
 end
