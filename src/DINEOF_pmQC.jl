@@ -21,11 +21,12 @@ weights=weights/sum(weights)
 
     if weights[1]>0
 	@show size(validpoints)
-    o=abs.(X[validpoints].-XA[validpoints])./sqrt.(max.(musquare.-errmap[validpoints],1E-10*musquare))
+    o=(X[validpoints].-XA[validpoints])./sqrt.(max.(musquare.-errmap[validpoints],1E-10*musquare))
 
     om=median(o)
+	@show om
 
-    del=1.4826*median(abs.(o.-om))
+    del=1.4826*median(abs.(o.-om))+1E-36
     @show del
     OO=zeros(Float64,size(X))
     OO[validpoints]=abs.(o.-om)./del
