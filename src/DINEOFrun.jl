@@ -1,8 +1,19 @@
-function DINEOFrun(X,whichgroups;minimumcoverage=(0.1, 0.1),cvmask="Automatic",cvfraction=0.01,cvmethod="Random")
+"""
+
+
+       DINEOFrun(X,whichgroups;minimumcoverage=(0.1, 0.1),cvmask="Automatic",cvfraction=0.01,cvmethod="Random",errormap="true",musquare=0)
+
+
+
+
+"""
+function DINEOFrun(X,whichgroups;minimumcoverage=(0.1, 0.1),cvmask="Automatic",cvfraction=0.01,cvmethod="Random",errormap="true",musquare=0)
     # X ND array with NaN at missing locations
     # whichgroups: array of 1 and 2 indicating which dimensions are collapsed together. eg [1 2 1 2] regroups dimensions 
     # 1 and 3 into i direction and 2 with 4 into j direction
     
+	errmap=[]
+	
     
     if cvmask=="Automatic"
         
@@ -120,14 +131,18 @@ function DINEOFrun(X,whichgroups;minimumcoverage=(0.1, 0.1),cvmask="Automatic",c
     
     U,S,V,cva,cvb=DINEOF_svds!(X2D,missingvalues,cvpoints)
 	# Decide here on musquare, error maps and QC estimators
+	
+	if musquare==0
 	mp=0.001*var(X2D):0.2*var(X2D):4*var(X2D)
 	@show mp
 	musquare=DINEOF_musquare(X2D,U,S,V,missingvalues,cvpoints;musquaresamples=mp,musquaremethod="cvpoints")[1]
+	@show musquare
+	end
 	#musquare=var(X2D)
 	
-	@show musquare
+	if errormap
 	errmap=DINEOF_errormap(U,S,V,musquare,missingvalues)
-	
+	end
 	
 	#
     # now roll back
@@ -140,7 +155,9 @@ function DINEOFrun(X,whichgroups;minimumcoverage=(0.1, 0.1),cvmask="Automatic",c
         V=deepcopy(TT)
         TT=[]
         X2D=permutedims(X2D,[2,1])
+		if errormap
         errmap=permutedims(errmap,[2,1])
+		end
     end
     
     # put back lines and columns (also SVD)
@@ -178,10 +195,12 @@ function DINEOFrun(X,whichgroups;minimumcoverage=(0.1, 0.1),cvmask="Automatic",c
     A[not_in2(clow, end), not_in2(Int64[], end)] = V
     V=A
     
+	if errormap
     A=fill(NaN,newsize)
     A[not_in2(rlow, end), not_in2(clow, end)] = errmap
     errmap=A
-    
+    end
+	
     @show "here"
     
     #U=DINEOF_insertNaNr(U,rlow)
@@ -207,8 +226,11 @@ function DINEOFrun(X,whichgroups;minimumcoverage=(0.1, 0.1),cvmask="Automatic",c
         VG[jj]= [reshape(V[:,jj],size(X)[g2])]
     end
     @show size(UG[1][1])
+	if errormap
+	errormap=permutedims(reshape(errmap ,sizeperminput)
+	end
     
-    return X,permutedims(reshape(XF2D ,sizeperminput),sortperm(perminput)),UG,S,VG,cva,cvb,permutedims(reshape(errmap ,sizeperminput),sortperm(perminput))
+    return X,permutedims(reshape(XF2D ,sizeperminput),sortperm(perminput)),UG,S,VG,cva,cvb,errmap,musquare,sortperm(perminput))
     # Or return 
 
     
