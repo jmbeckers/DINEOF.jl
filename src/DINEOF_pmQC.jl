@@ -25,14 +25,14 @@ M=prod(size(X))
 	@show Ilast
     I1 = oneunit(Ifirst)
 	for I in CartesianIndices(X)
-	    
+	    if !isnan(X[I])
 		for J in max(Ifirst, I-I1):min(Ilast, I+I1)
 			if isnan(X[J])
-			if !isnan(X[I])
+			
 				OO2[I]+=1
 			end
 				
-			end
+		end
 		end
 		
 		
@@ -51,23 +51,26 @@ M=prod(size(X))
 	@show Ilast
     I1 = oneunit(Ifirst)
 	for I in CartesianIndices(X)
+		if !isnan(X[I])
 	     values=zeros(Float64,boxsize)
 	     n=0
-		for J in max(Ifirst, I-ws*I1):min(Ilast, I+ws*I1)
-			if isnan(X[J])
+		
+			for J in max(Ifirst, I-ws*I1):min(Ilast, I+ws*I1)
+				if isnan(X[J])
 				
 				else
 				n+=1
 				values[n]=X[J]
+				end
 			end
-		end
-		values=values[1:n]
-		if n>0
-		vm=median(values)
-		del=1.4826*median(abs.(values.-vm))+1E-36
-		if !isnan(X[I])
-		  OO3[I]=abs(X[I]-vm)/del
-		end
+		
+			values=values[1:n]
+			if n>0
+				vm=median(values)
+				del=1.4826*median(abs.(values.-vm))+1E-36
+		
+				OO3[I]=abs(X[I]-vm)/del
+			end
 		end
 		
 	end
