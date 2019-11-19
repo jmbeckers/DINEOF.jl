@@ -120,9 +120,11 @@ function DINEOFrun(X,whichgroups;minimumcoverage=(0.1, 0.1),cvmask="Automatic",c
     
     U,S,V,cva,cvb=DINEOF_svds!(X2D,missingvalues,cvpoints)
 	# Decide here on musquare, error maps and QC estimators
-	mp=0.001*var(X2D):0.1*var(X2D):2*var(X2D)
+	mp=0.001*var(X2D):0.2*var(X2D):4*var(X2D)
 	@show mp
 	musquare=DINEOF_musquare(X2D,U,S,V,missingvalues,cvpoints;musquaresamples=mp,musquaremethod="cvpoints")[1]
+	#musquare=var(X2D)
+	
 	@show musquare
 	errmap=DINEOF_errormap(U,S,V,musquare,missingvalues)
 	

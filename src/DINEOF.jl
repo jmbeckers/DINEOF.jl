@@ -3,6 +3,7 @@ module DINEOF
 using LinearAlgebra
 using Arpack
 using Statistics
+using Random
 
 include("DINEOF_svd.jl")
 export DINEOF_svd

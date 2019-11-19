@@ -1,10 +1,38 @@
+"""
+
+
+    errormap=DINEOF_errormap(U,S,V,musquare,missingvalues)
+	
+# Analysis error variance based on OI interpretation of EOF base
+
+
+# Input: 
+
+
+* `U,S,V` decomposition 
+
+* `musquare` : error variance on data (including inflation for correlated data).
+
+* `missingvalues` : array of indexes of the missing values
+
+
+# Output:
+
+
+
+* `errormap` : array of error variance of reconstruction, same dimension as USV'
+
+
+
+
+"""
 function DINEOF_errormap(U,S,V,musquare,missingvalues)
     # Need to add optimisation of mysquare so keep location of cross-validation points in the parameter list 
     M=size(U)[1]
     N=size(V)[1]
     NE=size(U)[2]
     @show M,N,musquare
-	musquare=23.
+	
 	
     if N>M
         @warn("Sorry normally this function is called with N<M")
