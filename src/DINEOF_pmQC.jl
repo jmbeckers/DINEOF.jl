@@ -2,7 +2,7 @@ function DINEOF_pmQC(X,XA,errmap,musquare,ws)
 
 # poor mans quality check. Here XA is the EOF filtered field. Normally for consistency the OI-EOF analysed field should be used 
 # error maps is variance of error
-# TODO: add cloud and value indicators as in Aida's paper. Exploit multidimensional approach of bubble generation to make the ND generalisation
+# added cloud and value indicators as in Aida's paper. 
 #
 validpoints=.!isnan.(X)
 M=prod(size(X))
@@ -26,7 +26,9 @@ M=prod(size(X))
 	    
 		for J in max(Ifirst, I-I1):min(Ilast, I+I1)
 			if isnan(X[J])
+			if !isnan(X[I])
 				OO2[I]+=1
+			end
 				
 			end
 		end
