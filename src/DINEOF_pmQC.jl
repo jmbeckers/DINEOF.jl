@@ -45,14 +45,14 @@ M=prod(size(X))
 	OO3=zeros(Float64,size(X))
 	
 	boxsize=(ws*2+1)^ndims(X)
-	
+	values=zeros(Float64,boxsize)
 	
 	Ifirst, Ilast = CartesianIndices(X)[1], CartesianIndices(X)[M]
 	@show Ilast
     I1 = oneunit(Ifirst)
 	for I in CartesianIndices(X)
 		if !isnan(X[I])
-	     values=zeros(Float64,boxsize)
+	     
 	     n=0
 		
 			for J in max(Ifirst, I-ws*I1):min(Ilast, I+ws*I1)
@@ -64,10 +64,10 @@ M=prod(size(X))
 				end
 			end
 		
-			values=values[1:n]
+			#values=values[1:n]
 			if n>0
-				vm=median(values)
-				del=1.4826*median(abs.(values.-vm))+1E-36
+				vm=median(values[1:n])
+				del=1.4826*median(abs.(values[1:n] .-vm))+1E-36
 		
 				OO3[I]=abs(X[I]-vm)/del
 			end
