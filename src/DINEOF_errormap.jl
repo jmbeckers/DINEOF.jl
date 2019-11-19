@@ -3,26 +3,37 @@ function DINEOF_errormap(U,S,V,musquare,missingvalues)
     M=size(U)[1]
     N=size(V)[1]
     NE=size(U)[2]
-    @show M,N
+    @show M,N,musquare
+	musquare=23.
+	
     if N>M
         @warn("Sorry normally this function is called with N<M")
         return 1
     end
     # Loop on smaller dimension
     errmap=zeros(Float64,size(U)[1],N)
+	
+	qcmap=zeros(Float64,size(U)[1],N)
     for j=1:N
         # points that are present in the image j
         #@show j
         ipresent=setdiff(1:M,missingvalues[findall(x->x==j,missingvalues[:,2]),1])
-        Lp=U[ipresent,:]*diagm(S)/sqrt(N)
+		L=U*diagm(S)/sqrt(N)
+        #Lp=U[ipresent,:]*diagm(S)/sqrt(N)
         #@show size(Lp)
+		Lp=L[ipresent,:]
         AA=cholesky(Lp'*Lp/musquare+Matrix{Float64}(I, NE, NE))
-        BB= (U*diagm(S))*inv(AA.U)/sqrt(N)
+        #BB= (U*diagm(S))*inv(AA.U)/sqrt(N)
+		BB=L*inv(AA.U)
         for kk=1:NE
             errmap[:,j]=errmap[:,j]+BB[:,kk].*BB[:,kk]
         end
+		
+		
     end
     
+	
+	
     
     @show "ended"
     @show size(missingvalues),size(U),size(V),size(S),N,M,NE

@@ -13,6 +13,9 @@ export DINEOF_svds!
 include("DINEOF_errormap.jl")
 export DINEOF_errormap
 
+include("DINEOF_musquare.jl")
+export DINEOF_musquare
+
 include("DINEOF_cvmask.jl")
 export DINEOF_cvmask
 

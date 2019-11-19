@@ -275,7 +275,7 @@ function DINEOF_svds!(X,
         
     end
     
-    tutu=DINEOF_errormap(SVU,SVS,SVV,0.1,missingvalues)
     
-    return SVU,SVS,SVV,cvbest,cv[1:iloop],tutu
+    
+    return SVU,SVS,SVV,cvbest,cv[1:iloop]
 end
