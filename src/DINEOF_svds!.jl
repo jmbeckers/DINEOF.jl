@@ -60,9 +60,6 @@ function DINEOF_svds!(X,
     # Changes X !!!!
     # To get the filtered matrix, use the output to calculate USV'
     
-    #svdmeth="svd"
-    
-    #svdtol=0.000001
     varmatrix=var(X)
     squaremiss=0
     for jjj=1:size(missingvalues)[1]
@@ -88,7 +85,7 @@ function DINEOF_svds!(X,
     
     # keeps reconstructed values at the optimum
     if keeprestart
-    forfinalloop=zeros(Float64,size(missingvalues)[1])
+		forfinalloop=zeros(Float64,size(missingvalues)[1])
     end
     
     #stores all estimators
@@ -103,32 +100,27 @@ function DINEOF_svds!(X,
     end
     
     
-    
+    # Once a local minimum is found, moreloops loops are added. If no new minimum is found the search is stopped
     moreloops=4
     iloop=istart-1
     while moreloops>0
         iloop=iloop+1
     
-        # Try to implement loose iterations to start with (higher tolerance) and then more and more severe ones
-        # Another tweek could be the starting vector of the Krylov iterations that could be retrieved from previous iteration
-        #
-        #if iloop>istart
-        #SV=svds(X;nsv=min(iloop,ncmax),v0=SV.V[:,1])[1]
-        #else
-        # NEED TO ADD A CONVERGENCE LOOP FOR FIXED NUMBER OF EOF. 
-        
+       
+        # Loop over maximum number of iterations. If converged before a break is forced
         for iterc=1:dineofmaxiter
-            @show svdmeth,filter,filterintensity
-			
+            #@show svdmeth,filter,filterintensity
+			# SVD decomposition on a full matrix with some parameters
             SVU,SVS,SVV,ncon,nit=DINEOF_svd(X,min(iloop,ncmax),svdmeth,svdtol;filter=filter,filterintensity=filterintensity,filterrepetitions=filterrepetitions)
             
-            
+            # Check if the standard SVD decomposition worked out (basically if the matrix was not ill behaved)
             if ncon!=min(iloop,ncmax)
-                @warn("Convergence problem in svds")
+                @warn("Convergence problem in svds L1, will try to continue")
                 @show iloop,ncon,nit
             end
-        #end
-            varchange=0
+        
+		# Update missing points and keep track of changes amplitude in varchange
+        varchange=0
         for jj=1:size(missingvalues)[1]
             i=missingvalues[jj,1]
             j=missingvalues[jj,2]
@@ -139,11 +131,12 @@ function DINEOF_svds!(X,
             @show varchange/size(missingvalues)[1],varmatrix
             
             if varchange<dineoftol^2*varmatrix*size(missingvalues)[1]
-                @show iloop,varchange
+                @show iloop,varchange/size(missingvalues)[1]
                 break
             end
         end
         
+		# Once finished, calculate CV estimator
         cvval=0
         for jj=1:size(crossvalidation)[1]
             i=crossvalidation[jj,1]
@@ -153,10 +146,11 @@ function DINEOF_svds!(X,
             cvval=cvval+(X[i,j]-cvvalues[jj])^2
         end
         
+		# No cv points
         if size(crossvalidation)[1]==0
             cvval=1E37
         end
-        @show cvval
+        #@show cvval
         cv[iloop]=cvval
         # Avoid too flat cross validation curve near minimum and only accept "significant decrease"
         if cvval-cvbest<=-0.0001*cvbest
@@ -164,21 +158,14 @@ function DINEOF_svds!(X,
             ibest=iloop
             # If you want a clean final loop, store here the optimal data estimates at the missing points
             if keeprestart
-            for jj=1:size(missingvalues)[1]
-            i=missingvalues[jj,1]
-            j=missingvalues[jj,2]
-            forfinalloop[jj]=X[i,j]
+				for jj=1:size(missingvalues)[1]
+					i=missingvalues[jj,1]
+					j=missingvalues[jj,2]
+					forfinalloop[jj]=X[i,j]
+				end
             end
-            end
-            
-            
-            
-            #
-            
-            @show iloop,cvbest
             moreloops=4
-            
-        else
+          else
             moreloops=moreloops-1
         end
         if iloop>=ncmax
@@ -187,17 +174,15 @@ function DINEOF_svds!(X,
       
     end
     
-    # Ok, now we have the best value, now throw in the original data and calculate final decomposition (no rolling back for the moment
-    # hoping X was not to much deteriorated due to the additional vectors)
-    #
-    @show ibest,cvbest
+    # Ok, now we have the best value for number of EOF, throw in the original data and calculate final decomposition 
+    
     if keeprestart
         # put back the best estimate up to now
-    for jj=1:size(missingvalues)[1]
+		for jj=1:size(missingvalues)[1]
             i=missingvalues[jj,1]
             j=missingvalues[jj,2]
             X[i,j]=forfinalloop[jj]
-    end
+		end
     end
     
     # put back the cross validation values
@@ -212,18 +197,7 @@ function DINEOF_svds!(X,
     varchange=0
         SVU,SVS,SVV,ncon,nit=DINEOF_svd(X,min(ibest,ncmax),svdmeth,svdtol;filter=filter,filterintensity=filterintensity,filterrepetitions=filterrepetitions)
         
-        #if svdmeth=="svd"
-        #    SV,ncon,nit=svds(X;nsv=min(ibest,ncmax),tol=svdtol)[1:3]
-        #    SVS=SV.S
-        #    SVV=SV.V
-        #    SVU=SV.U
-        #end    
         
-        #if svdmeth=="eig"
-        #    SVS,SVV,ncon,nit=eigs(X'*X;nev=min(ibest,ncmax),tol=svdtol)[1:4]
-        #    SVS=sqrt.(abs.(SVS))
-        #    SVU=X*SVV*diagm(1.0 ./SVS)
-        #end
         
         if ncon!=min(ibest,ncmax)
             @warn("Convergence problem in final svds")
@@ -238,7 +212,7 @@ function DINEOF_svds!(X,
             X[i,j]=zz[1]
     end
         if varchange<dineoftol^2*varmatrix*size(missingvalues)[1]
-                @show iloop,varchange
+                @show ibest,varchange/size(missingvalues)[1]
                 break
         end
     end
@@ -249,8 +223,8 @@ function DINEOF_svds!(X,
         cv=cv./size(crossvalidation)[1]
     end
     
-    @show cv[1:iloop]
-    @show varmatrix,sum(SVS.^2)/prod(size(X)),var(X),prod(size(X)),size(SVS)
+    #@show cv[1:iloop]
+    @show varmatrix,sum(SVS.^2)/prod(size(X)),var(X)
     
     varmatrixf=var(X)
     squaremiss=0

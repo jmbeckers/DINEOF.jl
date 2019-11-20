@@ -82,12 +82,14 @@ function DINEOF_pmQC(X,XA,errmap,musquare,ws;weights=[1.0,1.0,1.0],statmeth="mea
 				end
 			end
 		end
+		# Scale to be value of 3 for half of points touching being NaN?
+		OO2=OO2*6.0/3.0^ndims(X)
 	end
 	
 
 #QC on local deviation of point from surrounding values
 # Actually quite exensive in huge arrays/dimensions
-# Maybe check if mean/var is much quicker ??
+# Maybe check if mean/var is much quicker ?? Yep it is seriously. So added the option statmeth=
 	@show "third"
 	if weights[3]>0
 		OO3=zeros(Float64,size(X))
@@ -112,7 +114,7 @@ function DINEOF_pmQC(X,XA,errmap,musquare,ws;weights=[1.0,1.0,1.0],statmeth="mea
 						vm=mean(values[1:n])
 						#del=1.4826*median(abs.(values[1:n] .-vm))+1E-36
 						del=std(values[1:n])
-						else
+					else
 						vm=median(values[1:n])
 						#m=mean(values[1:n])
 						del=1.4826*median(abs.(values[1:n] .-vm))+1E-36
