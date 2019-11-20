@@ -224,6 +224,9 @@ function DINEOF_svds!(X,
     end
     
     #@show cv[1:iloop]
+	########################################################################
+	# To work on
+	# Now some statistics on variances and estimates of musquare (observational error covariance)
     @show varmatrix,sum(SVS.^2)/prod(size(X)),var(X)
     
     varmatrixf=var(X)
@@ -236,7 +239,7 @@ function DINEOF_svds!(X,
     varmatrixfp=(sum(SVS.^2)-squaremiss)/(prod(size(X))-size(missingvalues)[1])
     
     musquare=varmatrixp-varmatrixfp
-	
+	# Adaptive estimate of mean(diag(R))  assuming U*S*V' is equivalent of an OI analysis
 	newmusquare=mean(X .* X .- X.* (SVU*diagm(SVS)*SVV') )*(prod(size(X))-size(missingvalues)[1])/prod(size(X))
     @show musquare,varmatrixp,varmatrixfp,varmatrixpp,newmusquare
     
@@ -250,8 +253,9 @@ function DINEOF_svds!(X,
         @warn("Initial Variance has been increased for filtered matrix  by factor $(sum(SVS.^2)/(var(X)*prod(size(X))))")
         
     end
-    
-    
+    # maybe add musquare to output parameters ? replace cvbest by [cvbest,musquare ].... whatever since for the moment cvbest was never used
+	#
+    ###########################################################################
     
     return SVU,SVS,SVV,cvbest,cv[1:iloop]
 end

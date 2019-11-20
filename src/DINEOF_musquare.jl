@@ -43,7 +43,7 @@ function DINEOF_musquare(X,U,S,V,missingvalues,cvpoints;musquaresamples=[0.01,0.
     NE=size(U)[2]
     NP=M*N-size(missingvalues)[1]
     NCV=size(cvpoints)[1]
-    @show M*N,NP,NCV
+    #@show M*N,NP,NCV
     
 	jlist=randperm(N)[1:min(N,maxjsamples)]
 	
@@ -121,6 +121,6 @@ function DINEOF_musquare(X,U,S,V,missingvalues,cvpoints;musquaresamples=[0.01,0.
 	end
     
     
-	@show bestin,bestincv
+	#@show bestin,bestincv
     return musquaresamples[bestin],thetascvvalues[bestin],thetasvalues,thetascvvalues
 end
