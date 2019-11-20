@@ -262,7 +262,9 @@ function DINEOF_svds!(X,
     varmatrixfp=(sum(SVS.^2)-squaremiss)/(prod(size(X))-size(missingvalues)[1])
     
     musquare=varmatrixp-varmatrixfp
-    @show musquare,varmatrixp,varmatrixfp,varmatrixpp
+	
+	newmusquare=mean(X .* X .- X.* (SVU*diagm(SVS)*SVV') )*(prod(size(X))-size(missingvalues)[1])/prod(size(X))
+    @show musquare,varmatrixp,varmatrixfp,varmatrixpp,newmusquare
     
     if musquare<0.000001*varmatrixp
         @warn("Strange")
