@@ -13,6 +13,16 @@ function DINEOFrun(X,whichgroups;minimumcoverage=(0.1, 0.1),cvmask="Automatic",c
     # whichgroups: array of 1 and 2 indicating which dimensions are collapsed together. eg [1 2 1 2] regroups dimensions 
     # 1 and 3 into i direction and 2 with 4 into j direction
     
+	
+	#TODOTODO take out mean !!!!!
+	datamean=mean(X[.!isnan.(X)])
+	datavar=var(X[.!isnan.(X)])
+	println("Raw data variance and mean: $datavar and $datamean")
+	println("Number of missing points (including possible masks): $(sum(isnan.(X))) out of $(prod(size(X)))")
+	X=X.-datamean
+	
+	
+	
 	errmap=[]
 	
     
@@ -31,6 +41,9 @@ function DINEOFrun(X,whichgroups;minimumcoverage=(0.1, 0.1),cvmask="Automatic",c
     
     # Do not use cross validation in already missing points
     cvmask[isnan.(X)].=false
+	
+	println("Number of data points before elimination of low coverage regions is $(sum(.!isnan.(X))) and cv fraction $(sum(cvmask)/sum(.!isnan.(X)))")
+	
     
     if size(whichgroups)[1]!=ndims(X)
         @error("Incompatible dimensions in whichgroups")
@@ -66,7 +79,7 @@ function DINEOFrun(X,whichgroups;minimumcoverage=(0.1, 0.1),cvmask="Automatic",c
     rlow=findall(x->x<newsize[2]*minimumcoverage[1],lcov)
     clow=findall(x->x<newsize[1]*minimumcoverage[2],ccov)
     
-    @show rlow,clow
+    #@show rlow,clow
     # Usefull functions: take out rows and colums with low coverage and when finished later put NaNs back
     not_in(inds::AbstractVector{Int}, n::Int)::Vector{Int} = setdiff(1:n, [ i for i in inds ])
     not_in2(inds::AbstractVector{Int}, n::Int)::Vector{Int} = setdiff(1:n,inds)
@@ -88,13 +101,15 @@ function DINEOFrun(X,whichgroups;minimumcoverage=(0.1, 0.1),cvmask="Automatic",c
     #
     varmatrix=var(X2D[.!isnan.(X2D)])
     missingpointsforvar=deepcopy(.!isnan.(X2D))
-    @show size(missingpointsforvar),size(X2D)
+    #@show size(missingpointsforvar),size(X2D)
     meanmatrix=mean(X2D[.!isnan.(X2D)])
-    @show varmatrix,meanmatrix
+    #@show varmatrix,meanmatrix
     
     NM=sum(isnan.(X2D))
     NMCV=sum(cv2D)
-    @show NM,NMCV
+    #@show NM,NMCV
+	println("Number of data points after elimination of low coverage regions is $(prod(size(X2D))-NM) and cv fraction $(NMCV/(prod(size(X2D))-NM))")
+	
     ##############################
 	
 	
@@ -134,15 +149,16 @@ function DINEOFrun(X,whichgroups;minimumcoverage=(0.1, 0.1),cvmask="Automatic",c
     
     
     
-    U,S,V,cva,cvb=DINEOF_svds!(X2D,missingvalues,cvpoints)
+    U,S,V,cva,cvb,musquareestimate=DINEOF_svds!(X2D,missingvalues,cvpoints)
 	# Decide here on musquare, error maps and QC estimators
 	# Get it back from svds and finetune with DINEOF_musquare around-way above the proposed value (inflation)
 	
 	if musquare==0
-		mp=0.001*var(X2D):0.2*var(X2D):4*var(X2D)
-		#@show mp
-		musquare=DINEOF_musquare(X2D,U,S,V,missingvalues,cvpoints;musquaresamples=mp,musquaremethod="cvpoints")[1]
-		@show musquare
+		mp=0.5*musquareestimate:0.5*musquareestimate:20*musquareestimate
+		@show mp
+		musquare,cvopt=DINEOF_musquare(X2D,U,S,V,missingvalues,cvpoints,cva;musquaresamples=mp,musquaremethod="")[1:2]
+		println("Estimated musquare $musquareestimate was inflated by factor $(musquare/musquareestimate) into $musquare")
+		println("This optimal value provides OI interpolation CV estimator $cvopt")
 	end
 	#musquare=var(X2D)
 	
@@ -184,7 +200,7 @@ function DINEOFrun(X,whichgroups;minimumcoverage=(0.1, 0.1),cvmask="Automatic",c
     
     @show varmatrix,varmatrixf,varmatrix-varmatrixf
     
-    @show "back"
+    #@show "back"
 	# Filled matrix NOT necessary if DINEOF_fuse is used
     #A=fill(NaN,newsize)
     #A[not_in2(rlow, end), not_in2(clow, end)] = X2D
@@ -208,7 +224,7 @@ function DINEOFrun(X,whichgroups;minimumcoverage=(0.1, 0.1),cvmask="Automatic",c
     errmap=A
     end
 	
-    @show "here"
+    #@show "here"
     
     #U=DINEOF_insertNaNr(U,rlow)
     #V=DINEOF_insertNaNr(V,clow)
@@ -218,16 +234,18 @@ function DINEOFrun(X,whichgroups;minimumcoverage=(0.1, 0.1),cvmask="Automatic",c
     
     
     # reshape
+	# Since X is not calculated maybe release array X2D instead?
+	X2D=[]
     #X=reshape(X2D ,sizeperminput)
     # permutation back into original form
     #@show sortperm(perminput),perminput
     #X=permutedims(X,sortperm(perminput))
     # For U and V only dimensions related to their group and make array of arrays
     # To do have a better way to store the EOFs on their grid. I think there is one level of [] too much ??
-    @show size(X)[g1],size(X)[g2],size(U),size(V)
+    #@show size(X)[g1],size(X)[g2],size(U),size(V)
     UG=fill([],size(U)[2])
     VG=fill([],size(U)[2])
-    @show UG,size(UG)
+    #@show UG,size(UG)
     for jj=1:size(U)[2]
         UG[jj]= [reshape(U[:,jj],size(X)[g1])]
         VG[jj]= [reshape(V[:,jj],size(X)[g2])]
@@ -237,7 +255,7 @@ function DINEOFrun(X,whichgroups;minimumcoverage=(0.1, 0.1),cvmask="Automatic",c
 		errmap=permutedims(reshape(errmap ,sizeperminput),sortperm(perminput))
 	end
     
-    return permutedims(reshape(XF2D ,sizeperminput),sortperm(perminput)),UG,S,VG,cva,cvb,errmap,musquare
+    return datamean,permutedims(reshape(XF2D ,sizeperminput),sortperm(perminput)),UG,S,VG,cva,cvb,errmap,musquare
     # Or return 
 
     

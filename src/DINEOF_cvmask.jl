@@ -49,7 +49,7 @@ function DINEOF_cvmask(X,coverage=0.01;cvmethod="Random",maxbubblesize=0.01*[siz
     #@show cvpoints
     if cvmethod=="Random"
         batchsize=Int(ceil(0.1*cvpoints))
-        @show batchsize
+        #@show batchsize
         while cvdone<cvpoints
            
             setofpoints=mod.(rand(Int,batchsize),M).+1
@@ -139,7 +139,7 @@ function DINEOF_cvmask(X,coverage=0.01;cvmethod="Random",maxbubblesize=0.01*[siz
             cvdone=sum(cvmask)
             ntimes=ntimes+1
             if ntimes>maximumiterations
-                @warn("requested cv points not reached, maybe not enought missing points to start with")
+                @warn("requested number of cv points not reached, maybe not enough missing points to start with; will continue though")
                 break
             end
                 

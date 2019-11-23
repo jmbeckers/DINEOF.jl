@@ -61,13 +61,20 @@ function DINEOF_svds!(X,
     # To get the filtered matrix, use the output to calculate USV'
     
     varmatrix=var(X)
+	meanmatrix=mean(X)
+	
+	
     squaremiss=0
     for jjj=1:size(missingvalues)[1]
-        squaremiss=squaremiss+X[missingvalues[jjj,1],missingvalues[jjj,2]]^2 
+        squaremiss=squaremiss+(X[missingvalues[jjj,1],missingvalues[jjj,2]]-meanmatrix)^2 
     end
     varmatrixp=(varmatrix*prod(size(X))-squaremiss)/(prod(size(X))-size(missingvalues)[1])
-    meanmatrix=mean(X)
-    @show varmatrix,meanmatrix,varmatrixp
+    varmatrixm=squaremiss/size(missingvalues)[1]
+	
+	println("svds!: variance and mean of the entry matrix: $varmatrix , $meanmatrix ; intial variance at points to fill in: $varmatrixm ")
+	
+	
+    #@show varmatrix,meanmatrix,varmatrixp,varmatrixm
     if meanmatrix^2>0.00001*varmatrix
         @warn("You should subtract a mean value from your data")
     end
@@ -128,10 +135,10 @@ function DINEOF_svds!(X,
                 varchange=varchange+(X[i,j]-zz[1])^2
             X[i,j]=zz[1]
         end
-            @show varchange/size(missingvalues)[1],varmatrix
+            #@show varchange/size(missingvalues)[1],varmatrix
             
             if varchange<dineoftol^2*varmatrix*size(missingvalues)[1]
-                @show iloop,varchange/size(missingvalues)[1]
+                println("Convergence for $iloop eofs, relative change $(sqrt((varchange/size(missingvalues)[1])/varmatrix)) after $iterc iterations")
                 break
             end
         end
@@ -151,6 +158,8 @@ function DINEOF_svds!(X,
             cvval=1E37
         end
         #@show cvval
+		tutu=cvval/max(1,size(crossvalidation)[1])
+		println("Eof loop $(iloop) with mean squared misfit: $(tutu) ")
         cv[iloop]=cvval
         # Avoid too flat cross validation curve near minimum and only accept "significant decrease"
         if cvval-cvbest<=-0.0001*cvbest
@@ -161,7 +170,8 @@ function DINEOF_svds!(X,
 				for jj=1:size(missingvalues)[1]
 					i=missingvalues[jj,1]
 					j=missingvalues[jj,2]
-					forfinalloop[jj]=X[i,j]
+					# Not sure a deepcopy is needed, but to be sure ...
+					forfinalloop[jj]=deepcopy(X[i,j])
 				end
             end
             moreloops=4
@@ -212,50 +222,54 @@ function DINEOF_svds!(X,
             X[i,j]=zz[1]
     end
         if varchange<dineoftol^2*varmatrix*size(missingvalues)[1]
-                @show ibest,varchange/size(missingvalues)[1]
+                #@show ibest,varchange/size(missingvalues)[1]
                 break
         end
     end
     
     # Provide variance
     if size(crossvalidation)[1]>0
+	#@show size(crossvalidation)[1]
+	#@show cvbest
         cvbest=cvbest/size(crossvalidation)[1]
         cv=cv./size(crossvalidation)[1]
     end
-    
+    println("Cross validation value (mean squared misfit): $cvbest for $ibest EOFs")
     #@show cv[1:iloop]
 	########################################################################
 	# To work on
 	# Now some statistics on variances and estimates of musquare (observational error covariance)
     @show varmatrix,sum(SVS.^2)/prod(size(X)),var(X)
     
-    varmatrixf=var(X)
-    squaremiss=0
-    for jjj=1:size(missingvalues)[1]
-        squaremiss=squaremiss+X[missingvalues[jjj,1],missingvalues[jjj,2]]^2 
-    end
-    varmatrixpp=(varmatrixf*prod(size(X))-squaremiss)/(prod(size(X))-size(missingvalues)[1])
+    #varmatrixf=var(X)
+    #squaremiss=0
+    #for jjj=1:size(missingvalues)[1]
+    #    squaremiss=squaremiss+X[missingvalues[jjj,1],missingvalues[jjj,2]]^2 
+    #end
+    #varmatrixpp=(varmatrixf*prod(size(X))-squaremiss)/(prod(size(X))-size(missingvalues)[1])
     
-    varmatrixfp=(sum(SVS.^2)-squaremiss)/(prod(size(X))-size(missingvalues)[1])
+    #varmatrixfp=(sum(SVS.^2)-squaremiss)/(prod(size(X))-size(missingvalues)[1])
     
-    musquare=varmatrixp-varmatrixfp
+    #musquare=varmatrixp-varmatrixfp
 	# Adaptive estimate of mean(diag(R))  assuming U*S*V' is equivalent of an OI analysis
-	newmusquare=mean(X .* X .- X.* (SVU*diagm(SVS)*SVV') )*(prod(size(X))-size(missingvalues)[1])/prod(size(X))
-    @show musquare,varmatrixp,varmatrixfp,varmatrixpp,newmusquare
+	# Should be better than our version of the paper
+	musquare=sum(X .* X .- X.* (SVU*diagm(SVS)*SVV') )/(prod(size(X))-size(missingvalues)[1])
     
-    if musquare<0.000001*varmatrixp
-        @warn("Strange")
-        musquare=0.000001*varmatrixp
+    @show musquare,musquare/varmatrix
+    if musquare<0.000001*varmatrix
+        @warn("Very low level of noise ? Fraction $(musquare/varmatrix) of total variance")
+        musquare=0.000001*varmatrix
+		@show musquare
     end
     
     
     if sum(SVS.^2) > varmatrix*prod(size(X))
-        @warn("Initial Variance has been increased for filtered matrix  by factor $(sum(SVS.^2)/(var(X)*prod(size(X))))")
+        @warn("Initial Variance has been increased for filtered matrix  by factor $(sum(SVS.^2)/(varmatrix*prod(size(X))))")
         
     end
     # maybe add musquare to output parameters ? replace cvbest by [cvbest,musquare ].... whatever since for the moment cvbest was never used
 	#
     ###########################################################################
     
-    return SVU,SVS,SVV,cvbest,cv[1:iloop]
+    return SVU,SVS,SVV,cvbest,cv[1:iloop],musquare
 end
