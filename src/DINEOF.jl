@@ -32,4 +32,7 @@ export DINEOF_fuse!
 include("DIVAnd_filter3.jl")
 export DIVAnd_filter3
 
+include("DINEOF_OIcheckX.jl")
+export DINEOF_OIcheckX
+
 end
