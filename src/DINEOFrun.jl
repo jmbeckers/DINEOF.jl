@@ -157,6 +157,12 @@ function DINEOFrun(X,whichgroups;minimumcoverage=(0.1, 0.1),cvmask="Automatic",c
 		mp=0.5*musquareestimate:0.5*musquareestimate:20*musquareestimate
 		@show mp
 		musquare,cvopt=DINEOF_musquare(X2D,U,S,V,missingvalues,cvpoints,cva;musquaresamples=mp,musquaremethod="")[1:2]
+		
+		
+		
+		
+		
+		
 		println("Estimated musquare $musquareestimate was inflated by factor $(musquare/musquareestimate) into $musquare")
 		println("This optimal value provides OI interpolation CV estimator $cvopt")
 	end
@@ -170,8 +176,9 @@ function DINEOFrun(X,whichgroups;minimumcoverage=(0.1, 0.1),cvmask="Automatic",c
     # now roll back
     #@show X2D
     #@show size(U),size(S),size(V)
-    # Transpose back if that was done (also SVD...)
+    # Transpose back if that was done (also SVD...) NEED TO CHECK IF V and be used as U without problem??? (Adjoint definition)
     if transposed
+	@show "Transposed"
         TT=deepcopy(U)
         U=deepcopy(V)
         V=deepcopy(TT)

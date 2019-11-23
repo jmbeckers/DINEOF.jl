@@ -38,6 +38,7 @@ for j in jlist
 		thetas=thetas+sum(XDcv[icv].^2)
 		ipoints=ipoints+size(icv)[1]
 end
-return (thetas/ipoints-cvEOF)^2/(cvEOF)^2,thetas,ipoints
+# Output squared relative change in CV value with respect to EOF CV estimator and OI CV estimator itself
+return (thetas/ipoints-cvEOF)^2/(cvEOF)^2,thetas/ipoints
 
 end

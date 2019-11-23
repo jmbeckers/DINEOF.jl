@@ -4,6 +4,7 @@ using LinearAlgebra
 using Arpack
 using Statistics
 using Random
+using Optim
 
 include("DINEOF_svd.jl")
 export DINEOF_svd

@@ -147,13 +147,13 @@ function DINEOF_musquare(X,U,S,V,missingvalues,cvpoints,cvEOF;musquaresamples=[0
     #@show thetasvalues
     if icvpoints>0
         thetascvvalues[ii]=(thetascv/icvpoints-cvEOF)^2/cvEOF^2
-		@time mycheck,tcheck,icheck=DINEOF_OIcheckCV(X,U,S,V,missingvalues,cvpoints,musquare,jlist,cvEOF)
-		@show thetascvvalues[ii],mycheck,thetascv,tcheck,icvpoints,icheck
+		@time thetascvvalues[ii],cvOI=DINEOF_OIcheckCV(X,U,S,V,missingvalues,cvpoints,musquare,jlist,cvEOF)
+		#@show thetascvvalues[ii],mycheck,thetascv,tcheck,icvpoints,icheck
     end
     if ispoints>0
 	
         thetasvalues[ii]=((thetas/ispoints)/(sum(S.^2)/size(S)[1]))
-		@time mycheck=DINEOF_OIcheckX(X,U,S,V,missingvalues,musquare,jlist)
+		@time mycheck,aerr=DINEOF_OIcheckX(X,U,S,V,missingvalues,musquare,jlist)
 		#@show thetasvalues[ii],mycheck
     end
     
@@ -179,5 +179,15 @@ function DINEOF_musquare(X,U,S,V,missingvalues,cvpoints,cvEOF;musquaresamples=[0
 	if bestin==1 || bestin==size(musquaresamples)[1]
 	@warn("Optimal value of musquare found at edge of search region $(musquaresamples[1]) to $(musquaresamples[end])")
 	end
+	
+	# OTher method
+	myfun(x)=DINEOF_OIcheckX(X,U,S,V,missingvalues,x,jlist)[1]
+	tutu=Optim.optimize( myfun ,musquaresamples[1], musquaresamples[end],rel_tol=0.01,abs_tol=1.E-7,iterations=15)
+	myfun2(x)=DINEOF_OIcheckCV(X,U,S,V,missingvalues,cvpoints,x,jlist,cvEOF)[1]
+	tutu2=Optim.optimize( myfun2 ,musquaresamples[1], musquaresamples[end],rel_tol=0.01,abs_tol=1.E-7,iterations=15)
+	@show tutu
+	@show tutu2
+	@show cvEOF
     return musquaresamples[bestin],thetascvvalues[bestin],thetasvalues,thetascvvalues
+	
 end

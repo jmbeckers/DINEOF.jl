@@ -30,6 +30,7 @@ for j in jlist
 		XD=S.*(invAAU*BB'*data/sqrt(N) - V[j,:])
 		thetas=thetas+sum(XD.^2)
 end
-return (thetas/(NE*size(jlist)[1]))/(sum(S.^2)/size(S)[1])
+# Output relative (OI-EOF) error variance with respect to signal variance and error variance
+return (thetas/(NE*size(jlist)[1]))/(sum(S.^2)/size(S)[1]),(thetas/(NE*size(jlist)[1]))
 
 end
