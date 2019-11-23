@@ -147,14 +147,14 @@ function DINEOF_musquare(X,U,S,V,missingvalues,cvpoints,cvEOF;musquaresamples=[0
     #@show thetasvalues
     if icvpoints>0
         thetascvvalues[ii]=(thetascv/icvpoints-cvEOF)^2/cvEOF^2
-		@time mycheck=DINEOF_OIcheckCV(X,U,S,V,missingvalues,cvpoints,musquare,jlist,cvEOF)
-		@show thetascvvalues[ii],mycheck
+		@time mycheck,tcheck,icheck=DINEOF_OIcheckCV(X,U,S,V,missingvalues,cvpoints,musquare,jlist,cvEOF)
+		@show thetascvvalues[ii],mycheck,thetascv,tcheck,icvpoints,icheck
     end
     if ispoints>0
 	
         thetasvalues[ii]=((thetas/ispoints)/(sum(S.^2)/size(S)[1]))
-		@time mycheck=DINEOF_OIcheckX(X,U,S,V,missingvalues,cvpoints,musquare,jlist)
-		@show thetasvalues[ii],mycheck
+		@time mycheck=DINEOF_OIcheckX(X,U,S,V,missingvalues,musquare,jlist)
+		#@show thetasvalues[ii],mycheck
     end
     
 	end

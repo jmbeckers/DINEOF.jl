@@ -19,9 +19,9 @@ for j in jlist
 		
 		
        
-		
-		ipresent=setdiff(1:M,[missingvalues[findall(x->x==j,missingvalues[:,2]),1]...,cvpoints[findall(x->x==j,cvpoints[:,2]),1]...])
 		icv=cvpoints[findall(x->x==j,cvpoints[:,2]),1]
+		ipresent=setdiff(1:M,[missingvalues[findall(x->x==j,missingvalues[:,2]),1]...,icv...])
+		
 
 		 			
         
@@ -38,6 +38,6 @@ for j in jlist
 		thetas=thetas+sum(XDcv[icv].^2)
 		ipoints=ipoints+size(icv)[1]
 end
-return (thetas/(ipoints)-cvEOF)^2/(cvEOF)^2
+return (thetas/ipoints-cvEOF)^2/(cvEOF)^2,thetas,ipoints
 
 end

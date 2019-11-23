@@ -35,4 +35,7 @@ export DIVAnd_filter3
 include("DINEOF_OIcheckX.jl")
 export DINEOF_OIcheckX
 
+include("DINEOF_OIcheckCV.jl")
+export DINEOF_OIcheckCV
+
 end
