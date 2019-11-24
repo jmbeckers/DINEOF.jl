@@ -254,8 +254,8 @@ function DINEOF_svds!(X,
 	# Adaptive estimate of mean(diag(R))  assuming U*S*V' is equivalent of an OI analysis
 	# Should be better than our version of the paper
 	musquare=sum(X .* X .- X.* (SVU*diagm(SVS)*SVV') )/(prod(size(X))-size(missingvalues)[1])
-    
-    @show musquare,musquare/varmatrix
+    println("Estimation for musquare based on DeRozier type of analysis: $musquare")
+    #@show musquare,musquare/varmatrix
     if musquare<0.000001*varmatrix
         @warn("Very low level of noise ? Fraction $(musquare/varmatrix) of total variance")
         musquare=0.000001*varmatrix

@@ -8,7 +8,17 @@
 
 
 """
-function DINEOFrun(X,whichgroups;minimumcoverage=(0.1, 0.1),cvmask="Automatic",cvfraction=0.01,cvmethod="Random",errormap=true,musquare=0,restart=[])
+function DINEOFrun(X,whichgroups;minimumcoverage=(0.1, 0.1),cvmask="Automatic",cvfraction=0.01,cvmethod="Random",errormap=true,musquare=0,restart=[],
+    keeprestart=true,
+	ncmax=size(X)[2]-1,
+	istart=1,
+	dineofmaxiter=10,
+	dineoftol=0.001,
+	svdmeth="svd",
+	svdtol=0.000001,
+	filter="None",
+	filterintensity=1.0,
+	filterrepetitions=1)
     # X ND array with NaN at missing locations
     # whichgroups: array of 1 and 2 indicating which dimensions are collapsed together. eg [1 2 1 2] regroups dimensions 
     # 1 and 3 into i direction and 2 with 4 into j direction
@@ -149,7 +159,17 @@ function DINEOFrun(X,whichgroups;minimumcoverage=(0.1, 0.1),cvmask="Automatic",c
     
     
     # NEED TO ADD OPTIONAL PARAMETERS ...
-    U,S,V,cva,cvb,musquareestimate=DINEOF_svds!(X2D,missingvalues,cvpoints)
+    U,S,V,cva,cvb,musquareestimate=DINEOF_svds!(X2D,missingvalues,cvpoints;
+	keeprestart=keeprestart,
+	ncmax=ncmax,
+	istart=istart,
+	dineofmaxiter=dineofmaxiter,
+	dineoftol=dineoftol,
+	svdmeth=svdmeth,
+	svdtol=svdtol,
+	filter=filter,
+	filterintensity=filterintensity,
+	filterrepetitions=filterrepetitions)
 	# Decide here on musquare, error maps and QC estimators
 	# Get it back from svds and finetune with DINEOF_musquare around-way above the proposed value (inflation)
 	
@@ -201,11 +221,11 @@ function DINEOFrun(X,whichgroups;minimumcoverage=(0.1, 0.1),cvmask="Automatic",c
     
     #@show size(U),size(V),size(S)
     XF2D=U*diagm(S)*V'
-    @show size(XF2D)
-    @show size(missingpointsforvar)
+    #@show size(XF2D)
+    #@show size(missingpointsforvar)
     varmatrixf=var(XF2D[missingpointsforvar])
     
-    @show varmatrix,varmatrixf,varmatrix-varmatrixf
+    #@show varmatrix,varmatrixf,varmatrix-varmatrixf
     
     #@show "back"
 	# Filled matrix NOT necessary if DINEOF_fuse is used

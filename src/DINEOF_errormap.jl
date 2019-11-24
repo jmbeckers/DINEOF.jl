@@ -31,11 +31,11 @@ function DINEOF_errormap(U,S,V,musquare,missingvalues)
     M=size(U)[1]
     N=size(V)[1]
     NE=size(U)[2]
-    @show M,N,musquare
+    #@show M,N,musquare
 	
 	
     if N>M
-        @warn("Sorry normally this function is called with N<M")
+        @warn("Sorry normally this error map function is called with N<M")
         return 1
     end
     
