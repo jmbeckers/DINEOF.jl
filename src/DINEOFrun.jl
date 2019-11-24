@@ -148,15 +148,14 @@ function DINEOFrun(X,whichgroups;minimumcoverage=(0.1, 0.1),cvmask="Automatic",c
     
     
     
-    
+    # NEED TO ADD OPTIONAL PARAMETERS ...
     U,S,V,cva,cvb,musquareestimate=DINEOF_svds!(X2D,missingvalues,cvpoints)
 	# Decide here on musquare, error maps and QC estimators
 	# Get it back from svds and finetune with DINEOF_musquare around-way above the proposed value (inflation)
 	
 	if musquare==0
-		mp=0.5*musquareestimate:0.5*musquareestimate:20*musquareestimate
-		@show mp
-		musquare,cvopt=DINEOF_musquare(X2D,U,S,V,missingvalues,cvpoints,cva;musquaresamples=mp,musquaremethod="")[1:2]
+		
+		musquare,cvopt=DINEOF_musquare(X2D,U,S,V,missingvalues,cvpoints,cva;musquarer=[0.5*musquareestimate,100*musquareestimate])[1:2]
 		
 		
 		
@@ -170,6 +169,7 @@ function DINEOFrun(X,whichgroups;minimumcoverage=(0.1, 0.1),cvmask="Automatic",c
 	
 	if errormap
 		errmap=DINEOF_errormap(U,S,V,musquare,missingvalues)
+		@show mean(errmap),cvopt-musquare
 	end
 	
 	#

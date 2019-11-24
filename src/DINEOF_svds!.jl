@@ -239,7 +239,7 @@ function DINEOF_svds!(X,
 	########################################################################
 	# To work on
 	# Now some statistics on variances and estimates of musquare (observational error covariance)
-    @show varmatrix,sum(SVS.^2)/prod(size(X)),var(X)
+    #@show varmatrix,sum(SVS.^2)/prod(size(X)),var(X)
     
     #varmatrixf=var(X)
     #squaremiss=0
