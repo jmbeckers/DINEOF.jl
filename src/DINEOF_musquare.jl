@@ -1,7 +1,7 @@
 """
 
 
-    musquare,thetavar,thetaoneoutvar,thetacvvar=DINEOF_musquare(X,U,S,V,missingvalues,cvpoints,cvEOF;musquarer=[.01,1.].*var(X),musquarew=[1.0,1.0],maxjsamples=100)
+    musquare,cvOI,J1,J2=DINEOF_musquare(X,U,S,V,missingvalues,cvpoints,cvEOF;musquarer=[.01,1.].*var(X),musquarew=[1.0,1.0],maxjsamples=100)
 
 # Estimator of mu_eff^2 
 
@@ -30,6 +30,9 @@
 
 * `cvOI`: cross validator value when OI is used
 
+* `J1`: relative difference of OI and EOF reconstruction
+
+* `J2`: relative error on CV estimator
 	
 
 """
@@ -64,19 +67,19 @@ function DINEOF_musquare(X,U,S,V,missingvalues,cvpoints,cvEOF;musquarer=[.01,1.]
 	musquareopt=0.
 	cvOI=0
 	if w2opt==0
-        println("OI-EOF error only")
+        println("musquare optimization: OI-EOF error only")
 	    tutu=Optim.optimize( myfun1 ,musquarer[1], musquarer[end],rel_tol=0.01,abs_tol=1.E-7,iterations=15)
 		musquareopt=Optim.minimizer(tutu)
 		MF1=DINEOF_OIcheckX(X,U,S,V,missingvalues,musquareopt,jlist)[1]
 	end
 	if w1opt==0
-        println("Best CV coherence only")
+        println("musquare optimization: Best CV coherence only")
 	    tutu=Optim.optimize( myfun2 ,musquarer[1], musquarer[end],rel_tol=0.01,abs_tol=1.E-7,iterations=15)
 		musquareopt=Optim.minimizer(tutu)
 		MF2,cvOI=DINEOF_OIcheckCV(X,U,S,V,missingvalues,cvpoints,musquareopt,jlist,cvEOF)
 	end
 	if w1opt>0 && w2opt>0
-		println("Both OI-EOF error and CV coherence")
+		println("musquare optimization: Both OI-EOF error and CV coherence")
 		tutu=Optim.optimize( myfunb ,musquarer[1], musquarer[end],rel_tol=0.01,abs_tol=1.E-7,iterations=15)
 		musquareopt=Optim.minimizer(tutu)
 		MF1=DINEOF_OIcheckX(X,U,S,V,missingvalues,musquareopt,jlist)[1]
