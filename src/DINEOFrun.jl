@@ -9,7 +9,7 @@
 
 """
 function DINEOFrun(X,whichgroups;minimumcoverage=(0.1, 0.1),cvmask="Automatic",cvfraction=0.01,cvmethod="Random",errormap=true,musquare=0,restart=[],
-    keeprestart=true,
+    keepsvdcvrestart=true,
 	eofmax=size(X)[2]-1,
 	eofstart=1,
 	dineofmaxiter=10,
@@ -57,6 +57,7 @@ function DINEOFrun(X,whichgroups;minimumcoverage=(0.1, 0.1),cvmask="Automatic",c
 			@show size(X),size(cvmask)
             return
         end
+		println("Using cvmask provided")
     end
     
     # Do not use cross validation in already missing points
@@ -183,7 +184,7 @@ function DINEOFrun(X,whichgroups;minimumcoverage=(0.1, 0.1),cvmask="Automatic",c
     
     # NEED TO ADD OPTIONAL PARAMETERS ...
     U,S,V,cva,cvb,musquareestimate=DINEOF_svds!(X2D,missingvalues,cvpoints;
-	keeprestart=keeprestart,
+	keeprestart=keepsvdcvrestart,
 	ncmax=eofmax,
 	istart=eofstart,
 	dineofmaxiter=dineofmaxiter,
