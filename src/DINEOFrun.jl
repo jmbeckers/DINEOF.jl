@@ -10,8 +10,8 @@
 """
 function DINEOFrun(X,whichgroups;minimumcoverage=(0.1, 0.1),cvmask="Automatic",cvfraction=0.01,cvmethod="Random",errormap=true,musquare=0,restart=[],
     keeprestart=true,
-	ncmax=size(X)[2]-1,
-	istart=1,
+	eofmax=size(X)[2]-1,
+	eofstart=1,
 	dineofmaxiter=10,
 	dineoftol=0.001,
 	svdmeth="svd",
@@ -24,13 +24,23 @@ function DINEOFrun(X,whichgroups;minimumcoverage=(0.1, 0.1),cvmask="Automatic",c
     # 1 and 3 into i direction and 2 with 4 into j direction
     
 	
-	#TODOTODO take out mean !!!!!
+	#For restart, transform restart matrix as X and at the end copy into X but test if necessary. Maybe drop deallocate via =[]
 	datamean=mean(X[.!isnan.(X)])
 	datavar=var(X[.!isnan.(X)])
 	println("Raw data variance and mean: $datavar and $datamean")
 	println("Number of missing points (including possible masks): $(sum(isnan.(X))) out of $(prod(size(X)))")
 	X=X.-datamean
-	
+	#  Also deal with restart values SUBRATCT MEAN THERE TOO
+	restart2D=[]
+	if restart!=[]
+		restart=restart.-datamean
+		if size(restart)!=size(X)
+            @error("Size for restart matrix and size of X do not correspond")
+			@show size(restart),size(X)
+            return
+        end
+	end
+	###################
 	
 	
 	errmap=[]
@@ -74,6 +84,10 @@ function DINEOFrun(X,whichgroups;minimumcoverage=(0.1, 0.1),cvmask="Automatic",c
     sizeperminput=size(X)[perminput]
     X2D=reshape(permutedims(X,perminput),newsize)
     cv2D=reshape(permutedims(cvmask,perminput),newsize)
+	if restart!=[]
+		restart2D=reshape(permutedims(restart,perminput),newsize)
+	end
+	
     #@show size(X2D)
     
     # now take out lines and columns with less the specified coverage
@@ -96,7 +110,9 @@ function DINEOFrun(X,whichgroups;minimumcoverage=(0.1, 0.1),cvmask="Automatic",c
   
     X2D=X2D[not_in(rlow, size(X2D,1)), not_in(clow, size(X2D,2))]
     cv2D=cv2D[not_in(rlow, size(cv2D,1)), not_in(clow, size(cv2D,2))]
-    
+    if restart!=[]
+		restart2D=cv2D[not_in(rlow, size(restart2D,1)), not_in(clow, size(restart2D,2))]
+	end
     
     # now transpose matrix if necessary
     transposed=false
@@ -104,6 +120,9 @@ function DINEOFrun(X,whichgroups;minimumcoverage=(0.1, 0.1),cvmask="Automatic",c
         transposed=true
         X2D=permutedims(X2D,[2,1])
         cv2D=permutedims(cv2D,[2,1])
+		if restart!=[]
+		restart2D=permutedims(restart2D,[2,1])
+		end
     end
     #######################################################################
 	# Some more work here to have info for users
@@ -135,11 +154,15 @@ function DINEOFrun(X,whichgroups;minimumcoverage=(0.1, 0.1),cvmask="Automatic",c
                 missingvalues[icount,2]=j
                 # Put a random value with average variance of present data so that we can keep an eye on how total variane
                 # behaves.
+				if restart==[]
                 X2D[i,j]=sqrt(varmatrix)*randn()
+				else
+				X2D[i,j]=deepcopy(restart2D[i,j])
+				end
             end
         end
     end
-    
+    restart2D=[]
     # Deal with cross-validation ... where?
     cvpoints=zeros(Int,(NMCV,2))
     icount=0
@@ -161,8 +184,8 @@ function DINEOFrun(X,whichgroups;minimumcoverage=(0.1, 0.1),cvmask="Automatic",c
     # NEED TO ADD OPTIONAL PARAMETERS ...
     U,S,V,cva,cvb,musquareestimate=DINEOF_svds!(X2D,missingvalues,cvpoints;
 	keeprestart=keeprestart,
-	ncmax=ncmax,
-	istart=istart,
+	ncmax=eofmax,
+	istart=eofstart,
 	dineofmaxiter=dineofmaxiter,
 	dineoftol=dineoftol,
 	svdmeth=svdmeth,
