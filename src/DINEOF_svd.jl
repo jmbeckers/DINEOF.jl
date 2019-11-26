@@ -11,18 +11,20 @@
 
 * `nele`: the number of singular vectors and values asked for (<=N)
 
-* `svdmeth`: if `svd` uses SVD decomposition, if `eig` uses eigenvalue approach on X'X. Results should be identical but CPU demand could be different
+* `svdmeth`: if "svd" uses SVD decomposition, if "eig" uses eigenvalue approach on X'X. Results should be identical but CPU demand could be different
 
 * `svdtol`: tolerance for convergence criteria during SVD decomposition
 
 * `filter`: Filter to be applied to second dimension. For the moment implementation of 
 
-"None" : no filter applied
-"vpmf" : Very poor mans filter: applies a postprocessing filter to V and adapts U and S to get an orthonormal base. It is NOT the best approximation of X or the filtered X
-"pmf" : poor mans filter: applies a preprocessing filter on X (or X'X which mathematically is identical). USV' is the best approximation to the filtered X
+   "None" : no filter applied
+   
+   "vpmf" : Very poor mans filter: applies a postprocessing filter to V and adapts U and S to get an orthonormal base. It is NOT the best approximation of X or the filtered X
+   
+   "pmf" : poor mans filter: applies a preprocessing filter on X (or X'X which mathematically is identical). USV' is the best approximation to the filtered X
 
 For the two filters a diffusion-like filter is applied. filterintensity=1 is the strongest filter that should be used and amounts to a 0.25,0.5,0.25 filter stencil.
-filterrepetitions defines how many diffusion-like steps are used (so how wide the filter stencil becomes)
+filterrepetitions defines how many diffusion-like steps are used (so how wide the filter stencil becomes). Presently not variable distance between images is implemented.
 
 
 
@@ -48,7 +50,15 @@ function DINEOF_svd(X,nele,svdmeth="svd",svdtol=0.00001;filter="None",filterinte
         FF[1,1]=1.0-filterintensity*0.25
         FF[end,end]=1.0-filterintensity*0.25
 		# Filter X
+		#b = similar(X, size(X,2)) # pre-allocate array for storing 
+
         for jjj=1:filterrepetitions
+		# TODO: make in place A_mul_B! multiplication to avoid allocations ??? or play with views etc ?
+		# This seems to be already much faster then X=X*FF but it modifies X????
+		#for i = 1:size(X, 1)
+		#  b=FF*deepcopy(X[i,:])
+        #  X[i,:] = b'
+        #end
         X=X*FF
         end
         end

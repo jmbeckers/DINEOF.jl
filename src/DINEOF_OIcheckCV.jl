@@ -1,7 +1,33 @@
 """
 
+
+     reldelCV,CVOI=DINEOF_OIcheckCV(X,U,S,V,missingvalues,cvpoints,musquare,jlist,cvEOF)
+
 Calculates the relative difference between DINEOF USV cross-validator estimator and OI analysis using musquare to calculate the cross validator value. The estimate is done using not all columns (images) but
 a list jlist. 
+
+# Input
+
+* `X` : the reconstructed (filtered array)
+
+* `U,S,V` from the EOF decomposition
+
+* `missingvalues` : list of points where the reconstruction was necessary
+
+* `cvpoints` : list of points used for cross validation
+
+* `musquare` : mu^2 used for the OI interpretation
+
+* `jlist`: an array of the columns in which the OI projection is to be compared to the EOF reconstruction
+
+* `cvEOF` : value of the cross validation estimator from EOF decomposition
+
+# Output
+
+`reldelCV`: relative difference between OI and EOF CV values
+
+`CVOI` : Cross validator from OI reconstruction
+
 
 """
 function DINEOF_OIcheckCV(X,U,S,V,missingvalues,cvpoints,musquare,jlist,cvEOF)

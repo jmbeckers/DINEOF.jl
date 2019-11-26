@@ -3,6 +3,8 @@
 
        DINEOFrun(X,whichgroups;minimumcoverage=(0.1, 0.1),cvmask="Automatic",cvfraction=0.01,cvmethod="Random",errormap=true,musquare=0,restart=[])
 
+Provides a DINEOF reconstruction of an N-dimensional array `X`. Missing points are identified with NaN values. Since the input arrays can have more than 2 dimensions, you have to specify which dimensions need to be collapsed into one. To do so the array `whichgroups` specifies to which collapsed dimensions (1 or 2) each dimension is collapsed into. The output is the filtered field. If it is to be merged with the original data, you can use DINEOF_fuse.
+
 
 
 
@@ -213,7 +215,7 @@ function DINEOFrun(X,whichgroups;minimumcoverage=(0.1, 0.1),cvmask="Automatic",c
 	
 	if errormap
 		errmap=DINEOF_errormap(U,S,V,musquare,missingvalues)
-		@show mean(errmap),cvopt-musquare
+		println("Mean error variance of reconstruction: $(mean(errmap)) ")
 	end
 	
 	#
@@ -311,3 +313,5 @@ function DINEOFrun(X,whichgroups;minimumcoverage=(0.1, 0.1),cvmask="Automatic",c
 
     
 end
+
+

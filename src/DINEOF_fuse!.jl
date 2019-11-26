@@ -4,8 +4,9 @@
 	  DINEOF_fuse!(X,XA,smoothiterations=4)
 
 
-# In place fusion of X and XA. X is modified in place such that where X is NaN it take the value found in XA. To smooth the transition between the two fields
-# weighting function can be used, with 1 in NaN locations of X propagated by box averaging
+# In place fusion of X and XA. 
+
+   X is modified in place such that where X is NaN it takes the value found in XA. To smooth the transition between the two fields weighting function can be used, with 1 in NaN locations of X propagated by box averaging
 
 
 # Input: 
@@ -15,7 +16,9 @@
 
 * `smoothiterations` : number of times a box filter is applied on the weights (starting with 1 in NaN positions and 0 elsewhere)
 
-# Output: in place modification of X
+# Output: 
+
+   in place modification of X
 
 
 

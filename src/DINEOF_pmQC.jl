@@ -1,6 +1,6 @@
 """
 
-      OutlierIndicator=DINEOF_pmQC(X,XA,errmap,musquare,ws;weights=[1.0,1.0,1.0])
+      OutlierIndicator=DINEOF_pmQC(X,XA,errmap,musquare,ws;weights=[1.0,1.0,1.0],statmeth="meanstd")
 	  
 # Outlier detection
 
@@ -18,7 +18,7 @@
 
 * `weights` : array of weights for the three outlier indicators (residuals, proximity to NaNs, data variability). If a weight is zero the corresponding indicator is not calculated. weights are normalized internally to have a sum of 1
 
-* `statmeth`: if meanstd mean and std are used, otherwise median and MAD (much slower)
+* `statmeth`: if "meanstd" mean and std are used, otherwise median and MAD (much slower)
 
 # Output:
 
@@ -55,22 +55,22 @@ function DINEOF_pmQC(X,XA,errmap,musquare,ws;weights=[1.0,1.0,1.0],statmeth="mea
 # QC on difference between data and analysis
     if weights[1]>0
 	    validpoints=.!isnan.(X) .& .!isnan.(XA)
-		@show size(validpoints)
+		#@show size(validpoints)
 		o=(X[validpoints].-XA[validpoints])./sqrt.(max.(musquare.-errmap[validpoints],1E-10*musquare))
 		om=median(o)
-		@show om
+		#@show om
 		del=1.4826*median(abs.(o.-om))+0.1*abs(om)
-		@show del
+		#@show del
 		OO=zeros(Float64,size(X))
 		OO[validpoints]=min.(abs.(o.-om)./del,10.0)
 	end
 # QC on touching NaNs
 	if weights[2]>0
-		@show "second"
+		#@show "second"
 		# will contain the number of neighbors with NaN
 		OO2=zeros(Float64,size(X))
 		Ifirst, Ilast = CartesianIndices(X)[1], CartesianIndices(X)[M]
-		@show Ilast
+		#@show Ilast
 		I1 = oneunit(Ifirst)
 		for I in CartesianIndices(X)
 			if !isnan(X[I])
@@ -90,13 +90,13 @@ function DINEOF_pmQC(X,XA,errmap,musquare,ws;weights=[1.0,1.0,1.0],statmeth="mea
 #QC on local deviation of point from surrounding values
 # Actually quite exensive in huge arrays/dimensions
 # Maybe check if mean/var is much quicker ?? Yep it is seriously. So added the option statmeth=
-	@show "third"
+	#@show "third"
 	if weights[3]>0
 		OO3=zeros(Float64,size(X))
 		boxsize=(ws*2+1)^ndims(X)
 		values=zeros(Float64,boxsize)
 		Ifirst, Ilast = CartesianIndices(X)[1], CartesianIndices(X)[M]
-		@show Ilast
+		#@show Ilast
 		I1 = oneunit(Ifirst)
 		for I in CartesianIndices(X)
 			if !isnan(X[I])

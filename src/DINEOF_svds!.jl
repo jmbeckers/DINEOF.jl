@@ -1,7 +1,18 @@
 """
 
 
-    U,S,V,=DINEOF_svds!()
+    U,S,V,cvEOF,cvarray,musquare=DINEOF_svds!(X,missingvalues,crossvalidation;
+	keeprestart=true,
+	ncmax=size(X)[2]-1,
+	istart=1,
+	dineofmaxiter=10,
+	dineoftol=0.001,
+	svdmeth="svd",
+	svdtol=0.000001,
+	filter="None",
+	filterintensity=1.0,
+	filterrepetitions=1
+	)
 
 # DINEOF SVD decomposition with filling in of missing points.
 
@@ -23,7 +34,7 @@
 
 * `dineoftol`: Defines the tolerance below which the iterations are stopped. Relative change of xxxxx
 
-For the other parameters, see DINEOF_svd
+For the other parameters, see `DINEOF_svd`
 
 
 
@@ -31,7 +42,13 @@ For the other parameters, see DINEOF_svd
 
 * `U,S,V`: the filled SVD decomposition such that in the infiltered version U*S*V' is the best approximation of X with nele singular vectors.
 
-* WARNING: X is updated at the missing data points !!!!!!
+* `cvEOF` : the cross validation estimator of the reconstrucion (variance of misfit at crossvalidation points)
+
+* `cvarray` : the cross validation estimator for different number of retained EOFs 
+
+* `musquare` : estimation of mu^2
+
+   WARNING: X is updated at the missing data points !!!!!!
 
 
 
@@ -255,6 +272,7 @@ function DINEOF_svds!(X,
 	# Should be better than our version of the paper
 	musquare=sum(X .* X .- X.* (SVU*diagm(SVS)*SVV') )/(prod(size(X))-size(missingvalues)[1])
     println("Estimation for musquare based on DeRozier type of analysis: $musquare")
+	println("Estimation of mean error variance of reconstuctions: $(musquare-cvbest) ")
     #@show musquare,musquare/varmatrix
     if musquare<0.000001*varmatrix
         @warn("Very low level of noise ? Fraction $(musquare/varmatrix) of total variance")
@@ -265,7 +283,8 @@ function DINEOF_svds!(X,
     
     if sum(SVS.^2) > varmatrix*prod(size(X))
         @warn("Initial Variance has been increased for filtered matrix  by factor $(sum(SVS.^2)/(varmatrix*prod(size(X))))")
-        
+		else
+        println("Explained variance  $(100*sum(SVS.^2)/(varmatrix*prod(size(X)))) percent")
     end
     # maybe add musquare to output parameters ? replace cvbest by [cvbest,musquare ].... whatever since for the moment cvbest was never used
 	#
