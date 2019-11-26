@@ -65,6 +65,12 @@ for j in jlist
 		ipoints=ipoints+size(icv)[1]
 end
 # Output squared relative change in CV value with respect to EOF CV estimator and OI CV estimator itself
+
+if ipoints==0
+# Dont penalize search for best mu if you cannot calculate CV
+    return 0,1E36
+end
+
 return (thetas/ipoints-cvEOF)^2/(cvEOF)^2,thetas/ipoints
 
 end
