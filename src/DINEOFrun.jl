@@ -113,6 +113,9 @@ function DINEOFrun(X,whichgroups=[ones(Int32,ndims(X)-1)...,2];
 	filter="None",
 	filterintensity=1.0,
 	filterrepetitions=1)
+	
+	
+	
     # X ND array with NaN at missing locations
     # whichgroups: array of 1 and 2 indicating which dimensions are collapsed together. eg [1 2 1 2] regroups dimensions 
     # 1 and 3 into i direction and 2 with 4 into j direction
