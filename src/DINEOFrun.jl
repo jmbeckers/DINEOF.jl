@@ -1,16 +1,87 @@
 """
 
 
-       DINEOFrun(X,whichgroups;minimumcoverage=(0.1, 0.1),cvmask="Automatic",cvfraction=0.01,cvmethod="Random",errormap=true,musquare=0,restart=[])
+    offset,XA,U,S,V,cvEOF,cvarray,errmap,musquare=DINEOFrun(X,whichgroups;
+	minimumcoverage=(0.1, 0.1),
+	cvmask="Automatic",
+	cvfraction=0.01,
+	cvmethod="Random",
+	errormap=true,
+	musquare=0,
+	restart=[],
+    keepsvdcvrestart=true,
+	eofmax=size(X)[2]-1,
+	eofstart=1,
+	dineofmaxiter=10,
+	dineoftol=0.001,
+	svdmeth="svd",
+	svdtol=0.000001,
+	filter="None",
+	filterintensity=1.0,
+	filterrepetitions=1)
+
+
 
 Provides a DINEOF reconstruction of an N-dimensional array `X`. Missing points are identified with NaN values. Since the input arrays can have more than 2 dimensions, you have to specify which dimensions need to be collapsed into one. To do so the array `whichgroups` specifies to which collapsed dimensions (1 or 2) each dimension is collapsed into. The output is the filtered field. If it is to be merged with the original data, you can use DINEOF_fuse.
 
+# Input:
+
+* `X`: The N-dimensional array containing the data. Missing points are NaN
+
+* `whichgroups`: array of "1" or "2" of size ndims(X). for each dimension it tells if it goes into dimensions 1 or 2 for the SVD decomposition
+
+# Optional Inputs with their defaults:
+
+* `minimumcoverage=(0.1, 0.1)` : The minimum coverage in each dimension for the collapsed matrix. If the coverage is below the threshold, the line or colums is taken out
+
+* `cvmask="Automatic"` : You can provide your own cross-validation mask. In that case cvmask is a boolean array of the same size as X with "true" on points for crossvalidation. If "Automatic", DINEOF will create the mask based on the next parameters
+
+* `cvfraction=0.01` : fraction of points to be used for cross validation (fraction is with respect to valid points)
+	
+* `cvmethod="Random"` : method to create the 
+*	`errormap=true`
+*	`musquare=0`
+*	`restart=[]`
+*    `keepsvdcvrestart=true`
+*	`eofmax=size(X)[2]-1`
+*	`eofstart=1`
+*	`dineofmaxiter=10`
+*	`dineoftol=0.001`
+*	`svdmeth="svd"`
+*	`svdtol=0.000001`
+*	`filter="None"`
+*	`filterintensity=1.0`
+*	`filterrepetitions=1`
 
 
 
+# Output:
+
+`offset` : the value that was subtracted from the original data to center them
+
+`XA` : the analysed (filtered) data filled in in places where enough data where available (see coverage parameter)
+
+`U` : U array. To get access to mode 2: U[2]...
+
+`S`: array of singular values. use diagm(S) if you want to worh with matrices
+
+`V` : V array: To get mode 3:
+
+`cvEOF` : cross validation estimator (variance of misfit at cross validation points)
+
+`errmap` : Array of the same structure as X containing the error variance estimate of the reconstruction XA
+
+`musquare` : The value of mu^2 used for the OI interpretation leading to error maps
 
 """
-function DINEOFrun(X,whichgroups;minimumcoverage=(0.1, 0.1),cvmask="Automatic",cvfraction=0.01,cvmethod="Random",errormap=true,musquare=0,restart=[],
+function DINEOFrun(X,whichgroups;
+	minimumcoverage=(0.1, 0.1),
+	cvmask="Automatic",
+	cvfraction=0.01,
+	cvmethod="Random",
+	errormap=true,
+	musquare=0,
+	restart=[],
     keepsvdcvrestart=true,
 	eofmax=size(X)[2]-1,
 	eofstart=1,
