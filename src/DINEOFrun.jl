@@ -38,20 +38,22 @@ Provides a DINEOF reconstruction of an N-dimensional array `X`. Missing points a
 
 * `cvfraction=0.01` : fraction of points to be used for cross validation (fraction is with respect to valid points)
 	
-* `cvmethod="Random"` : method to create the 
-*	`errormap=true`
-*	`musquare=0`
-*	`restart=[]`
-*    `keepsvdcvrestart=true`
-*	`eofmax=size(X)[2]-1`
-*	`eofstart=1`
-*	`dineofmaxiter=10`
-*	`dineoftol=0.001`
-*	`svdmeth="svd"`
-*	`svdtol=0.000001`
-*	`filter="None"`
-*	`filterintensity=1.0`
-*	`filterrepetitions=1`
+* `cvmethod="Random"` : method to create the cross validation mask. "Random" "Bubbles" or "CopyMask": TODO pass more parameters ....
+
+*	`errormap=true` : if false, error map returned is []
+
+*	`musquare=0` : You can provide your own estimate of musquare to be used for OI error map calculations. If 0, DINEOF will do the estimate
+*	`restart=[]` : You can provide an array of the same size of X to fill in the first guess in the missing points. If not provided, the matrix is filled randomly with a variance of the present data
+*    `keepsvdcvrestart=true` : makes sure that during the optimisation of the number of EOFS, when finally calculating the decomposition one goes back to the best estimate at that moment
+*	`eofmax=size(X)[2]-1`: maximum number of EOFs 
+*	`eofstart=1` : number of EOFs to start with in the search of the optimum. Can be larger than 1, particularly if you had a good restart matrix
+*	`dineofmaxiter=10` : Maximum Number of iterations  USV=X, X=fillfrom(USV) 
+*	`dineoftol=0.001` : relative change during iterations below which one stops
+*	`svdmeth="svd"` : work with SVD or with eigenvalues of X'X ("eig")
+*	`svdtol=0.000001` : tolerance during svd decomposition of filled matrix (svds or eig)
+*	`filter="None"` : filter to be applied to dimension 2
+*	`filterintensity=1.0` : filter intensity
+*	`filterrepetitions=1` : filter repetitions
 
 
 
