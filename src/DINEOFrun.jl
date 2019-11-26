@@ -6,6 +6,8 @@
 	cvmask="Automatic",
 	cvfraction=0.01,
 	cvmethod="Random",
+	maxbubblesize=0.01*[size(X)...],
+	dimensionsforcopy=[],
 	errormap=true,
 	musquare=0,
 	restart=[],
@@ -30,7 +32,7 @@ Provides a DINEOF reconstruction of an N-dimensional array `X`. Missing points a
 
 * `whichgroups`: array of "1" or "2" of size ndims(X). for each dimension it tells if it goes into dimensions 1 or 2 for the SVD decomposition
 
-# Optional Inputs with their defaults:
+# Optional keyword inputs with their defaults:
 
 * `minimumcoverage=(0.1, 0.1)` : The minimum coverage in each dimension for the collapsed matrix. If the coverage is below the threshold, the line or colums is taken out
 
@@ -38,42 +40,57 @@ Provides a DINEOF reconstruction of an N-dimensional array `X`. Missing points a
 
 * `cvfraction=0.01` : fraction of points to be used for cross validation (fraction is with respect to valid points)
 	
-* `cvmethod="Random"` : method to create the cross validation mask. "Random" "Bubbles" or "CopyMask": TODO pass more parameters ....
+* `cvmethod="Random"` : method to create the cross validation mask. "Random" "Bubbles" or "CopyMask": If "Bubbles" are created the maximum size in each direction is specified in maxbubblesize. If "CopyMask" is used, dimensionsforcopy specifies along which dimensions tha NaN pattern of X can be copied to create a mask
+
+* `maxbubblesize=0.01*[size(X)...]` : maximum size of the bubbles in each direction 
+	
+*	`dimensionsforcopy=[]`: array of 0 and 1. For each direction is indicates if one can move a mask of NaNs from X along that direction.
 
 *	`errormap=true` : if false, error map returned is []
 
 *	`musquare=0` : You can provide your own estimate of musquare to be used for OI error map calculations. If 0, DINEOF will do the estimate
+
 *	`restart=[]` : You can provide an array of the same size of X to fill in the first guess in the missing points. If not provided, the matrix is filled randomly with a variance of the present data
-*    `keepsvdcvrestart=true` : makes sure that during the optimisation of the number of EOFS, when finally calculating the decomposition one goes back to the best estimate at that moment
+
+*    `keepsvdcvrestart=true` : goes back to the best estimate of the reconstruction during final EOF decomposition
+
 *	`eofmax=size(X)[2]-1`: maximum number of EOFs 
+
 *	`eofstart=1` : number of EOFs to start with in the search of the optimum. Can be larger than 1, particularly if you had a good restart matrix
+
 *	`dineofmaxiter=10` : Maximum Number of iterations  USV=X, X=fillfrom(USV) 
+
 *	`dineoftol=0.001` : relative change during iterations below which one stops
+
 *	`svdmeth="svd"` : work with SVD or with eigenvalues of X'X ("eig")
+
 *	`svdtol=0.000001` : tolerance during svd decomposition of filled matrix (svds or eig)
+
 *	`filter="None"` : filter to be applied to dimension 2
+
 *	`filterintensity=1.0` : filter intensity
+
 *	`filterrepetitions=1` : filter repetitions
 
 
 
 # Output:
 
-`offset` : the value that was subtracted from the original data to center them
+* `offset` : the value that was subtracted from the original data to center them
 
-`XA` : the analysed (filtered) data filled in in places where enough data where available (see coverage parameter)
+* `XA` : the analysed (filtered) data filled in in places where enough data where available (see coverage parameter)
 
-`U` : U array. To get access to mode 2: U[2]...
+* `U` : array of U arrays. To get access to mode 2: U[2][1]
 
-`S`: array of singular values. use diagm(S) if you want to worh with matrices
+* `S`: array of singular values. use diagm(S) if you want to work with matrices
 
-`V` : V array: To get mode 3:
+* `V` : array of V arrays: To get mode 3: V[3][1]
 
-`cvEOF` : cross validation estimator (variance of misfit at cross validation points)
+* `cvEOF` : cross validation estimator (variance of misfit at cross validation points)
 
-`errmap` : Array of the same structure as X containing the error variance estimate of the reconstruction XA
+* `errmap` : array of the same structure as X containing the error variance estimate of the reconstruction XA
 
-`musquare` : The value of mu^2 used for the OI interpretation leading to error maps
+* `musquare` : the value of mu^2 used for the OI interpretation leading to error maps
 
 """
 function DINEOFrun(X,whichgroups;
@@ -81,6 +98,8 @@ function DINEOFrun(X,whichgroups;
 	cvmask="Automatic",
 	cvfraction=0.01,
 	cvmethod="Random",
+	maxbubblesize=0.01*[size(X)...],
+	dimensionsforcopy=[],
 	errormap=true,
 	musquare=0,
 	restart=[],
