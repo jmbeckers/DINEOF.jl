@@ -209,7 +209,7 @@ function DINEOFrun(X,whichgroups=[ones(Int32,ndims(X)-1)...,2];
     X2D=X2D[not_in(rlow, size(X2D,1)), not_in(clow, size(X2D,2))]
     cv2D=cv2D[not_in(rlow, size(cv2D,1)), not_in(clow, size(cv2D,2))]
     if restart!=[]
-		restart2D=cv2D[not_in(rlow, size(restart2D,1)), not_in(clow, size(restart2D,2))]
+		restart2D=restart2D[not_in(rlow, size(restart2D,1)), not_in(clow, size(restart2D,2))]
 	end
     
     # now transpose matrix if necessary
