@@ -1,13 +1,13 @@
 """
 
 
-    offset,XA,U,S,V,cvEOF,cvarray,errmap,musquare=DINEOFrun(X,whichgroups;
+    offset,XA,U,S,V,cvEOF,cvarray,errmap,musquare=DINEOFrun(X,whichgroups=[ ones(Int32,ndims(X)-1)...,2];
 	minimumcoverage=(0.1, 0.1),
 	cvmask="Automatic",
 	cvfraction=0.01,
 	cvmethod="Random",
 	maxbubblesize=0.01*[size(X)...],
-	dimensionsforcopy=[],
+	dimensionsforcopy=[zeros(Int32,ndims(X)-1),1],
 	errormap=true,
 	musquare=0,
 	restart=[],
@@ -30,7 +30,7 @@ Provides a DINEOF reconstruction of an N-dimensional array `X`. Missing points a
 
 * `X`: The N-dimensional array containing the data. Missing points are NaN
 
-* `whichgroups`: array of "1" or "2" of size ndims(X). for each dimension it tells if it goes into dimensions 1 or 2 for the SVD decomposition
+* `whichgroups`: array of "1" or "2" of size ndims(X). for each dimension it tells if it goes into dimensions 1 or 2 for the SVD decomposition. Default is last dimension is group 2 only
 
 # Optional keyword inputs with their defaults:
 
@@ -44,7 +44,7 @@ Provides a DINEOF reconstruction of an N-dimensional array `X`. Missing points a
 
 * `maxbubblesize=0.01*[size(X)...]` : maximum size of the bubbles in each direction 
 	
-*	`dimensionsforcopy=[]`: array of 0 and 1. For each direction is indicates if one can move a mask of NaNs from X along that direction.
+*	`dimensionsforcopy=[zeros(Int32,ndims(X)-1),1]`: array of 0 and 1. For each direction is indicates if one can move a mask of NaNs from X along that direction.
 
 *	`errormap=true` : if false, error map returned is []
 
@@ -66,7 +66,7 @@ Provides a DINEOF reconstruction of an N-dimensional array `X`. Missing points a
 
 *	`svdtol=0.000001` : tolerance during svd decomposition of filled matrix (svds or eig)
 
-*	`filter="None"` : filter to be applied to dimension 2
+*	`filter="None"` : filter to be applied to dimension 2. Note that this is the dimension in the innermost svd decomposition which might be dimension 1 of the outermost call since a transpose is performed if M<N
 
 *	`filterintensity=1.0` : filter intensity
 
@@ -93,13 +93,13 @@ Provides a DINEOF reconstruction of an N-dimensional array `X`. Missing points a
 * `musquare` : the value of mu^2 used for the OI interpretation leading to error maps
 
 """
-function DINEOFrun(X,whichgroups;
+function DINEOFrun(X,whichgroups=[ones(Int32,ndims(X)-1)...,2];
 	minimumcoverage=(0.1, 0.1),
 	cvmask="Automatic",
 	cvfraction=0.01,
 	cvmethod="Random",
 	maxbubblesize=0.01*[size(X)...],
-	dimensionsforcopy=[],
+	dimensionsforcopy=[zeros(Int32,ndims(X)-1),1],
 	errormap=true,
 	musquare=0,
 	restart=[],
@@ -316,7 +316,7 @@ function DINEOFrun(X,whichgroups;
     #@show size(U),size(S),size(V)
     # Transpose back if that was done (also SVD...) NEED TO CHECK IF V and be used as U without problem??? (Adjoint definition)
     if transposed
-	@show "Transposed"
+	println("Internally final matrix was transposed for SVD analysis")
         TT=deepcopy(U)
         U=deepcopy(V)
         V=deepcopy(TT)
@@ -341,7 +341,7 @@ function DINEOFrun(X,whichgroups;
     XF2D=U*diagm(S)*V'
     #@show size(XF2D)
     #@show size(missingpointsforvar)
-    varmatrixf=var(XF2D[missingpointsforvar])
+    #varmatrixf=var(XF2D[missingpointsforvar])
     
     #@show varmatrix,varmatrixf,varmatrix-varmatrixf
     
