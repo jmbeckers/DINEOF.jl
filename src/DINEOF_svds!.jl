@@ -172,7 +172,8 @@ function DINEOF_svds!(X,
         
 		# No cv points
         if size(crossvalidation)[1]==0
-            cvval=1E37
+		# without cv points, force estimator to decrease so that the requested number of EOFs can be reached
+            cvval=1E37/iloop
         end
         #@show cvval
 		tutu=cvval/max(1,size(crossvalidation)[1])
