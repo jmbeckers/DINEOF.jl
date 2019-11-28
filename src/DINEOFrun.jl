@@ -1,7 +1,7 @@
 """
 
 
-    offset,XA,U,S,V,cvEOF,cvarray,errmap,musquare=DINEOFrun(X,whichgroups=[ ones(Int32,ndims(X)-1)...,2];
+    XA,offset,U,S,V,cvEOF,cvarray,errmap,musquare=DINEOFrun(X,whichgroups=[ ones(Int32,ndims(X)-1)...,2];
 	minimumcoverage=(0.1, 0.1),
 	cvmask="Automatic",
 	cvfraction=0.01,
@@ -75,10 +75,9 @@ Provides a DINEOF reconstruction of an N-dimensional array `X`. Missing points a
 
 
 # Output:
+* `XA` : the analysed (filtered) data filled in in places where enough data where available (see coverage parameter) including the offset: XA=offset+U S V'
 
 * `offset` : the value that was subtracted from the original data to center them
-
-* `XA` : the analysed (filtered) data filled in in places where enough data where available (see coverage parameter)
 
 * `U` : array of U arrays. To get access to mode 2: U[2][1]
 
@@ -198,6 +197,7 @@ function DINEOFrun(X,whichgroups=[ones(Int32,ndims(X)-1)...,2];
     lcov=dropdims(sum(.!isnan.(X2D),dims=2),dims=2) .- dropdims(sum(cv2D,dims=2),dims=2)
     #@show ccov,size(ccov)
     #@show lcov,size(lcov)
+	#NEED TO CHECK
     rlow=findall(x->x<newsize[2]*minimumcoverage[1],lcov)
     clow=findall(x->x<newsize[1]*minimumcoverage[2],ccov)
     
@@ -403,7 +403,7 @@ function DINEOFrun(X,whichgroups=[ones(Int32,ndims(X)-1)...,2];
 		errmap=permutedims(reshape(errmap ,sizeperminput),sortperm(perminput))
 	end
     
-    return datamean,permutedims(reshape(XF2D ,sizeperminput),sortperm(perminput)),UG,S,VG,cva,cvb,errmap,musquare
+    return permutedims(reshape(XF2D ,sizeperminput),sortperm(perminput)),datamean,UG,S,VG,cva,cvb,errmap,musquare
     # Or return 
 
     

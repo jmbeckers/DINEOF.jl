@@ -93,7 +93,7 @@ function DINEOF_svds!(X,
 	
 	if isnan(varmatrix)
 	
-	@err("Input to svds! should not include NaN anymore")
+	@error("Input to svds! should not include NaN anymore")
 	end
 	
 	
