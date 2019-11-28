@@ -7,7 +7,7 @@
 	cvfraction=0.01,
 	cvmethod="Random",
 	maxbubblesize=0.01*[size(X)...],
-	dimensionsforcopy=[zeros(Int32,ndims(X)-1),1],
+	dimensionsforcopy=[zeros(Int32,ndims(X)-1)...,1],
 	errormap=true,
 	musquare=0,
 	restart=[],
@@ -99,7 +99,7 @@ function DINEOFrun(X,whichgroups=[ones(Int32,ndims(X)-1)...,2];
 	cvfraction=0.01,
 	cvmethod="Random",
 	maxbubblesize=0.01*[size(X)...],
-	dimensionsforcopy=[zeros(Int32,ndims(X)-1),1],
+	dimensionsforcopy=[zeros(Int32,ndims(X)-1)...,1],
 	errormap=true,
 	musquare=0,
 	restart=[],
@@ -145,7 +145,7 @@ function DINEOFrun(X,whichgroups=[ones(Int32,ndims(X)-1)...,2];
     
     if cvmask=="Automatic"
         
-        cvmask=DINEOF_cvmask(X,cvfraction;cvmethod=cvmethod)
+        cvmask=DINEOF_cvmask(X,cvfraction;cvmethod=cvmethod,dimensionsforcopy=dimensionsforcopy,maxbubblesize=maxbubblesize)
         
     else
         #@show size(cvmask),size(X)

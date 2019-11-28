@@ -76,6 +76,8 @@ function DINEOF_svds!(X,
     # istart: starting point into the eof decomposition
     # Changes X !!!!
     # To get the filtered matrix, use the output to calculate USV'
+	
+	println("svds matrix size: $(size(X))")
     
     varmatrix=var(X)
 	meanmatrix=mean(X)
