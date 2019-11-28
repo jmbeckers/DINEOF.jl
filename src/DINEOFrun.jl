@@ -252,7 +252,7 @@ function DINEOFrun(X,whichgroups=[ones(Int32,ndims(X)-1)...,2];
                 missingvalues[icount,2]=j
                 # Put a random value with average variance of present data so that we can keep an eye on how total variane
                 # behaves.
-				if restart==[]
+				if restart==[] || isnan(restart2D[i,j])
                 X2D[i,j]=sqrt(varmatrix)*randn()
 				else
 				X2D[i,j]=deepcopy(restart2D[i,j])

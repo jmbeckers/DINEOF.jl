@@ -90,11 +90,18 @@ function DINEOF_svds!(X,
     varmatrixp=(varmatrix*prod(size(X))-squaremiss)/(prod(size(X))-size(missingvalues)[1])
     varmatrixm=squaremiss/size(missingvalues)[1]
 	
+	
+	if isnan(varmatrix)
+	
+	@err("Input to svds! should not include NaN anymore")
+	end
+	
+	
 	println("svds!: variance and mean of the entry matrix: $varmatrix , $meanmatrix ; intial variance at points to fill in: $varmatrixm ")
 	
 	
     #@show varmatrix,meanmatrix,varmatrixp,varmatrixm
-    if meanmatrix^2>0.00001*varmatrix
+    if meanmatrix^2>0.0001*varmatrix
         @warn("You should subtract a mean value from your data")
     end
     # cross validation
