@@ -186,7 +186,7 @@ function DINEOF_svds!(X,
         end
         #@show cvval
 		tutu=cvval/max(1,size(crossvalidation)[1])
-		println("Eof loop $(iloop) with mean squared misfit: $(tutu) ")
+		println("Eof loop $(iloop) with root mean squared misfit: $(sqrt(tutu)) ")
         cv[iloop]=cvval
         # Avoid too flat cross validation curve near minimum and only accept "significant decrease"
         if cvval-cvbest<=-0.0001*cvbest
@@ -261,7 +261,7 @@ function DINEOF_svds!(X,
         cvbest=cvbest/size(crossvalidation)[1]
         cv=cv./size(crossvalidation)[1]
     end
-    println("Cross validation value (mean squared misfit): $cvbest for $ibest EOFs")
+    println("Cross validation value (root mean squared misfit): $(sqrt(cvbest)) for $ibest EOFs")
     #@show cv[1:iloop]
 	########################################################################
 	# To work on

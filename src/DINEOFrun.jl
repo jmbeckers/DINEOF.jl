@@ -292,7 +292,7 @@ function DINEOFrun(X,whichgroups=[ones(Int32,ndims(X)-1)...,2];
     # free cv2D
     cv2D=[]
     
-	@show mean(X2D),meanmatrix,meanmiss
+	@show mean(X2D),meanmatrix,meanmiss,datamean
     
     
     # NEED TO ADD OPTIONAL PARAMETERS ...
