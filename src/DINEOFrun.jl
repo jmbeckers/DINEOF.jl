@@ -422,7 +422,7 @@ function DINEOFrun(X,whichgroups=[ones(Int32,ndims(X)-1)...,2];
 		errmap=permutedims(reshape(errmap ,sizeperminput),sortperm(perminput))
 	end
     
-    return permutedims(reshape(XF2D ,sizeperminput),sortperm(perminput)),datamean+meanmatrix,U,S,V,cva,cvb,errmap,musquare
+    return permutedims(reshape(XF2D ,sizeperminput),sortperm(perminput)).+datamean.+meanmatrix,datamean+meanmatrix,U,S,V,cva,cvb,errmap,musquare
     # Or return 
 
     
