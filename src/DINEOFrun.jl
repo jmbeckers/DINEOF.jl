@@ -182,7 +182,9 @@ function DINEOFrun(X,whichgroups=[ones(Int32,ndims(X)-1)...,2];
     X2D=reshape(permutedims(X,perminput),newsize)
     cv2D=reshape(permutedims(cvmask,perminput),newsize)
 	if restart!=[]
+	    println("Using restart matrix")
 		restart2D=reshape(permutedims(restart,perminput),newsize)
+		@show mean(restart2D[.!isnan.(restart2D)])
 	end
 	
     #@show size(X2D)
@@ -210,6 +212,7 @@ function DINEOFrun(X,whichgroups=[ones(Int32,ndims(X)-1)...,2];
     cv2D=cv2D[not_in(rlow, size(cv2D,1)), not_in(clow, size(cv2D,2))]
     if restart!=[]
 		restart2D=restart2D[not_in(rlow, size(restart2D,1)), not_in(clow, size(restart2D,2))]
+		@show mean(restart2D[.!isnan.(restart2D)])
 	end
     
     # now transpose matrix if necessary
@@ -227,7 +230,8 @@ function DINEOFrun(X,whichgroups=[ones(Int32,ndims(X)-1)...,2];
     # Ok, now we have the working matrix. Do some stats on it:
     #
     varmatrix=var(X2D[.!isnan.(X2D)])
-    missingpointsforvar=deepcopy(.!isnan.(X2D))
+    
+	#missingpointsforvar=deepcopy(.!isnan.(X2D))
     #@show size(missingpointsforvar),size(X2D)
     meanmatrix=mean(X2D[.!isnan.(X2D)])
     #@show varmatrix,meanmatrix
@@ -237,6 +241,7 @@ function DINEOFrun(X,whichgroups=[ones(Int32,ndims(X)-1)...,2];
 	
 	if restart!=[]
 		restart2D=restart2D.-meanmatrix
+		@show mean(restart2D[.!isnan.(restart2D)])
 	end
     
     NM=sum(isnan.(X2D))
@@ -251,6 +256,7 @@ function DINEOFrun(X,whichgroups=[ones(Int32,ndims(X)-1)...,2];
     # Probably not very elegant but hey...
     missingvalues=zeros(Int,(NM,2))
     icount=0
+	meanmiss=0
     for j=1:size(X2D)[2]
         for i=1:size(X2D)[1]
             if isnan(X2D[i,j])
@@ -264,9 +270,11 @@ function DINEOFrun(X,whichgroups=[ones(Int32,ndims(X)-1)...,2];
 				else
 				X2D[i,j]=deepcopy(restart2D[i,j])
 				end
+				meanmiss=meanmiss+X2D[i,j]
             end
         end
     end
+	meanmiss=meanmiss/icount
     restart2D=[]
     # Deal with cross-validation ... where?
     cvpoints=zeros(Int,(NMCV,2))
@@ -284,6 +292,7 @@ function DINEOFrun(X,whichgroups=[ones(Int32,ndims(X)-1)...,2];
     # free cv2D
     cv2D=[]
     
+	@show mean(X2D),meanmatrix,meanmiss
     
     
     # NEED TO ADD OPTIONAL PARAMETERS ...
@@ -398,19 +407,22 @@ function DINEOFrun(X,whichgroups=[ones(Int32,ndims(X)-1)...,2];
     # For U and V only dimensions related to their group and make array of arrays
     # To do have a better way to store the EOFs on their grid. I think there is one level of [] too much ??
     #@show size(X)[g1],size(X)[g2],size(U),size(V)
-    UG=fill([],size(U)[2])
-    VG=fill([],size(U)[2])
+    #UG=fill([],size(U)[2])
+    #VG=fill([],size(U)[2])
     #@show UG,size(UG)
-    for jj=1:size(U)[2]
-        UG[jj]= [reshape(U[:,jj],size(X)[g1])]
-        VG[jj]= [reshape(V[:,jj],size(X)[g2])]
-    end
+    #for jj=1:size(U)[2]
+    #    UG[jj]= [reshape(U[:,jj],size(X)[g1])]
+    #    VG[jj]= [reshape(V[:,jj],size(X)[g2])]
+    #end
     #@show size(UG[1][1])
+	U=reshape(U,(size(X)[g1]...,size(U)[2]))
+	V=reshape(V,(size(X)[g2]...,size(V)[2]))
+	#@show size(U),size(UG[1][1])
 	if errormap
 		errmap=permutedims(reshape(errmap ,sizeperminput),sortperm(perminput))
 	end
     
-    return permutedims(reshape(XF2D ,sizeperminput),sortperm(perminput)),datamean+meanmatrix,UG,S,VG,cva,cvb,errmap,musquare
+    return permutedims(reshape(XF2D ,sizeperminput),sortperm(perminput)),datamean+meanmatrix,U,S,V,cva,cvb,errmap,musquare
     # Or return 
 
     
