@@ -110,9 +110,14 @@ function DINEOF_svd(X,nele,svdmeth="svd",svdtol=0.00001;filter="None",filterinte
         SVU=Array(qr(SVU).Q)
         #SVS=diag(SVU'*X*SVV)
         #SVSO=deepcopy(SVS)
-		# Finally take the diagonal of U*X*V' (which is not diagonal here anymore)
+		# Finally take the diagonal of U'*X*V (which is not diagonal here anymore)
         for k=1:size(SVS)[1]
             SVS[k]=SVU[:,k]'*X*SVV[:,k]
+			if SVS[k]<0.0
+			  
+			  SVS[k]=-SVS[k]
+			  SVU[:,k] .= -SVU[:,k]
+			end
         end
         #@show (SVSO.-SVS)./SVSO
     end

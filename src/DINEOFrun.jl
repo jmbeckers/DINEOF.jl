@@ -231,6 +231,13 @@ function DINEOFrun(X,whichgroups=[ones(Int32,ndims(X)-1)...,2];
     #@show size(missingpointsforvar),size(X2D)
     meanmatrix=mean(X2D[.!isnan.(X2D)])
     #@show varmatrix,meanmatrix
+	# Maybe better subtract also meanmatrix ????
+	
+	X2D=X2D .- meanmatrix
+	
+	if restart!=[]
+		restart2D=restart2D.-meanmatrix
+	end
     
     NM=sum(isnan.(X2D))
     NMCV=sum(cv2D)
@@ -403,7 +410,7 @@ function DINEOFrun(X,whichgroups=[ones(Int32,ndims(X)-1)...,2];
 		errmap=permutedims(reshape(errmap ,sizeperminput),sortperm(perminput))
 	end
     
-    return permutedims(reshape(XF2D ,sizeperminput),sortperm(perminput)),datamean,UG,S,VG,cva,cvb,errmap,musquare
+    return permutedims(reshape(XF2D ,sizeperminput),sortperm(perminput)),datamean+meanmatrix,UG,S,VG,cva,cvb,errmap,musquare
     # Or return 
 
     
