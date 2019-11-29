@@ -68,6 +68,7 @@ end
 
 if ipoints==0
 # Dont penalize search for best mu if you cannot calculate CV
+    @warn("No cross-validation points found in the columns analyzed")
     return 0,1E36
 end
 

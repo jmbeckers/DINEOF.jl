@@ -105,8 +105,8 @@ function DINEOFrun(X,whichgroups=[ones(Int32,ndims(X)-1)...,2];
     keepsvdcvrestart=true,
 	eofmax=size(X)[2]-1,
 	eofstart=1,
-	dineofmaxiter=10,
-	dineoftol=0.001,
+	dineofmaxiter=15,
+	dineoftol=0.005,
 	svdmeth="svd",
 	svdtol=0.000001,
 	filter="None",
@@ -240,6 +240,7 @@ function DINEOFrun(X,whichgroups=[ones(Int32,ndims(X)-1)...,2];
 	X2D=X2D .- meanmatrix
 	
 	if restart!=[]
+	    @show mean(restart2D[.!isnan.(restart2D)])
 		restart2D=restart2D.-meanmatrix
 		@show mean(restart2D[.!isnan.(restart2D)])
 	end
