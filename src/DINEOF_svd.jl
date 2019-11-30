@@ -52,15 +52,16 @@ function DINEOF_svd(X,nele,svdmeth="svd",svdtol=0.00001;filter="None",filterinte
 		# Filter X
 		#b = similar(X, size(X,2)) # pre-allocate array for storing 
 
-        for jjj=1:filterrepetitions
+        #for jjj=1:filterrepetitions
 		# TODO: make in place A_mul_B! multiplication to avoid allocations ??? or play with views etc ?
 		# This seems to be already much faster then X=X*FF but it modifies X????
 		#for i = 1:size(X, 1)
 		#  b=FF*deepcopy(X[i,:])
         #  X[i,:] = b'
         #end
-        X=X*FF
-        end
+		
+           X=X*FF^filterrepetitions
+        
         end
         
             SV,ncon,nit=svds(X;nsv=nele,tol=svdtol)[1:3]
@@ -77,9 +78,10 @@ function DINEOF_svd(X,nele,svdmeth="svd",svdtol=0.00001;filter="None",filterinte
         FF=Tridiagonal(0.25*filterintensity*ones(Float64,n-1),(1.0-filterintensity*0.5)*ones(Float64,n),0.25*filterintensity*ones(Float64,n-1))
         FF[1,1]=1.0-filterintensity*0.25
         FF[end,end]=1.0-filterintensity*0.25
-        for jjj=1:filterrepetitions
-        BB=FF*BB*FF
-        end
+        #for jjj=1:filterrepetitions
+		FFT=FF^filterrepetitions
+        BB=FFT*BB*FFT
+        #end
         end
         
         
@@ -97,9 +99,9 @@ function DINEOF_svd(X,nele,svdmeth="svd",svdtol=0.00001;filter="None",filterinte
         FF=Tridiagonal(0.25*filterintensity*ones(Float64,n-1),(1.0-filterintensity*0.5)*ones(Float64,n),0.25*filterintensity*ones(Float64,n-1))
         FF[1,1]=1.0-filterintensity*0.25
         FF[end,end]=1.0-filterintensity*0.25
-        for jjj=1:filterrepetitions
-        SVV=FF*SVV
-        end
+        #for jjj=1:filterrepetitions
+        SVV=FF^filterrepetitions*SVV
+        #end
         #DINEOF_GSORTHO!(SVV)
 		# Now reorthonormalize the singular vectors
         SVV=Array(qr(SVV).Q)
