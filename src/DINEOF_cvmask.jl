@@ -24,7 +24,7 @@
 * `cvmask`: boolean array of the same size as input array X with "true" on points to be used for cross-valitation
 
 """
-function DINEOF_cvmask(X,coverage=0.01;cvmethod="Random",maxbubblesize=0.01*[size(X)...],dimensionsforcopy=[],maximumiterations=1000)
+function DINEOF_cvmask(X,coverage=0.01;cvmethod="Random",maxbubblesize=max.(5.0,0.01*[size(X)...]),dimensionsforcopy=[],maximumiterations=1000)
 
     # Creates cross validation points for the ND-array X
     # X already has missing points where X is NaN
@@ -34,7 +34,7 @@ function DINEOF_cvmask(X,coverage=0.01;cvmethod="Random",maxbubblesize=0.01*[siz
     # CopyMask: copy NaN mask from a slice of X into another slice in cross validation matrix. The dimensions along which the slices are moved are
     #  put to 1 on the array dimensionsforcopy. 
     # cvmask is "true" for the points to be possibly used for cross validation
-    
+    @show maxbubblesize,max.(5.0,0.01*[size(X)...])
     M=prod(size(X))
     cvmask=fill(false,size(X))
     
@@ -64,15 +64,17 @@ function DINEOF_cvmask(X,coverage=0.01;cvmethod="Random",maxbubblesize=0.01*[siz
     end
     
     if cvmethod=="Bubbles"
-        #@show maxbubblesize     
+        @show maxbubblesize     
         # For the moment  implemented as ellipsoides 
         #bsize=Int(ceil(sum(maxbubblesize)/size(bubblesize)[1]/2))
-        #@show bsize
+        #@show bubblesize
         Ifirst, Ilast = CartesianIndices(X)[1], CartesianIndices(X)[M]
         #@show Ifirst,Ilast
         I1 = oneunit(Ifirst)
         #@show I1
         while cvdone<cvpoints
+		@show cvdone,cvpoints
+		flush(stdout)
             position=mod(rand(Int),M)+1
             #@show CartesianIndices(X)[position]
             I=CartesianIndices(X)[position]

@@ -187,6 +187,7 @@ function DINEOF_svds!(X,
 
             if varchange<dineoftol^2*varmatrix*size(missingvalues)[1]
                 println("Convergence for $iloop eofs, relative change $(sqrt((varchange/size(missingvalues)[1])/varmatrix)) after $iterc iterations")
+				flush(stdout)
                 break
             end
         end
