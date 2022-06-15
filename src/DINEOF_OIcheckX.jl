@@ -34,14 +34,14 @@ data=zeros(Float64,M)
 XD=zeros(Float64,NE)
 thetas=0.0
 
-
+L=U*diagm(S)/sqrt(N)
 # Loop over some columns (images) only 
 for j in jlist
 
 		# Take the present data only
         ipresent=setdiff(1:M,missingvalues[findall(x->x==j,missingvalues[:,2]),1])
 		# See paper on error calculation
-		L=U*diagm(S)/sqrt(N)
+		
         Lp=L[ipresent,:]
         AA=cholesky(Lp'*Lp+musquare*Matrix{Float64}(I, NE, NE))
         invAAU=inv(AA.U)

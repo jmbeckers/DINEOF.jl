@@ -40,6 +40,7 @@ data=zeros(Float64,M)
 XDcv=zeros(Float64,M)
 thetas=0.0
 ipoints=0
+L=U*diagm(S)/sqrt(N)
 for j in jlist
   
 		
@@ -52,7 +53,7 @@ for j in jlist
 		 			
         
 		
-		L=U*diagm(S)/sqrt(N)
+		
         Lp=L[ipresent,:]
         AA=cholesky(Lp'*Lp+musquare*Matrix{Float64}(I, NE, NE))
         invAAU=inv(AA.U)
