@@ -42,7 +42,7 @@ M=size(X)[1]
 N=size(X)[2]
 NE=size(S)[1]
 
-X[isnan.(X)].= 0.0
+#X[isnan.(X)].= 0.0
 U[isnan.(U)].= 0.0
 
 
@@ -53,9 +53,9 @@ L=U*diagm(S)/sqrt(N)
 
 for j in jlist
   
-		ipresent=setdiff(1:M,[missingvalues[findall(x->x==j,missingvalues[:,2]),1]...,icv...])
-  
 		
+  
+		ipresent=.!isnan.(X[:,j])
 		
         Lp=L[ipresent,:]
         AA=cholesky(Lp'*Lp+musquare*Matrix{Float64}(I, NE, NE))
@@ -67,6 +67,6 @@ for j in jlist
 
 end
 
-return XOI
+return reshape(XOI,size(XR))
 
 end
