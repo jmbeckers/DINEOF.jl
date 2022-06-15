@@ -22,7 +22,7 @@ SORRY ONLY IMPLEMENTED FOR last dimension being the "time"
 """
 
 
-function DINEOF_OI(XR,UR,S,musquare;jlist=1:size(XR)[2],whichgroups=[ones(Int32,ndims(XR)-1)...,2])
+function DINEOF_OI(XR,UR,S,musquare;jlist=1:size(XR)[end],whichgroups=[ones(Int32,ndims(XR)-1)...,2])
 
 
 
@@ -45,11 +45,15 @@ NE=size(S)[1]
 #X[isnan.(X)].= 0.0
 U[isnan.(U)].= 0.0
 
+myrefm=mean(XR[.!isnan.(XR)])
+@show myrefm,size(X),size(U)
 
 data=zeros(Float64,M)
 XOI=zeros(Float64,size(X))
 
 L=U*diagm(S)/sqrt(N)
+
+@show jlist
 
 for j in jlist
   
@@ -62,10 +66,11 @@ for j in jlist
         invAAU=inv(AA.U)
         BB=L*invAAU
         data.=0.0
-		data[ipresent]=X[ipresent,j]
-		XOI[:,j]=BB*(BB'*data)
+		data[ipresent]=X[ipresent,j].-myrefm
+		XOI[:,j]=BB*(BB'*data).+myrefm
 
 end
+@show mean(XOI[.!isnan.(XOI)])
 
 return reshape(XOI,size(XR))
 
