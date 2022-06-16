@@ -42,4 +42,8 @@ export DINEOF_OI
 include("DINEOF_OIcheckCV.jl")
 export DINEOF_OIcheckCV
 
+include("DINEOF_moveoneslice!.jl")
+export DINEOF_moveoneslice!
+
+
 end

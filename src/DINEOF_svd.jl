@@ -1,7 +1,7 @@
 """
 
 
-    U,S,V,ncon,nit=DINEOF_svd(X,nele,svdmeth="svd",svdtol=0.00001;filter="None",filterintensity=1.0,filterrepetitions=1)
+    U,S,V,ncon,nit=DINEOF_svd(X,nele,svdmeth="svd",svdtol=0.00001;tfilter="None",filterintensity=1.0,filterrepetitions=1)
 
 # Lowest level interface to SVD decomposition
 
@@ -15,7 +15,7 @@
 
 * `svdtol`: tolerance for convergence criteria during SVD decomposition
 
-* `filter`: Filter to be applied to second dimension. For the moment implementation of 
+* `tfilter`: Filter to be applied to second dimension. For the moment implementation of 
 
    "None" : no filter applied
    
@@ -37,11 +37,11 @@ filterrepetitions defines how many diffusion-like steps are used (so how wide th
 * `nit` : number of iterations needed to find the singular values (can be used to adapt tolerance svdtol)
 
 """
-function DINEOF_svd(X,nele,svdmeth="svd",svdtol=0.00001;filter="None",filterintensity=1.0,filterrepetitions=1)
+function DINEOF_svd(X,nele,svdmeth="svd",svdtol=0.00001;tfilter="None",filterintensity=1.0,filterrepetitions=1)
     
     
     if svdmeth=="svd"
-        if filter=="pmf"
+        if tfilter=="pmf"
         #@show "poor man filter"
         n=size(X)[2]
 		# Simple filter not taking into acount different distances between columns of X*FF
@@ -71,7 +71,7 @@ function DINEOF_svd(X,nele,svdmeth="svd",svdtol=0.00001;filter="None",filterinte
     end
     if svdmeth=="eig"
         BB=X'*X
-        if filter=="pmf"
+        if tfilter=="pmf"
         #@show "poor man filter"
         n=size(X)[2]
 		# Same filter as for svd application but here applied to the covariance matrix
@@ -92,7 +92,7 @@ function DINEOF_svd(X,nele,svdmeth="svd",svdtol=0.00001;filter="None",filterinte
         SVU=X*SVV*diagm(1.0 ./SVS)
     end
     
-    if filter=="vpmf"
+    if tfilter=="vpmf"
         #@show "Very poor man filter"
         n=size(X)[2]
 		# Same filter as for pmf but applied a posteriori to the singular vectors V

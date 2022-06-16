@@ -37,7 +37,7 @@ end
 	dineoftol=0.001,
 	svdmeth="svd",
 	svdtol=0.000001,
-	filter="None",
+	tfilter="None",
 	filterintensity=1.0,
 	filterrepetitions=1
 	)
@@ -91,7 +91,7 @@ function DINEOF_svds!(X,
 	dineoftol=0.001,
 	svdmeth="svd",
 	svdtol=0.000001,
-	filter="None",
+	tfilter="None",
 	filterintensity=1.0,
 	filterrepetitions=1
 	)
@@ -172,7 +172,7 @@ function DINEOF_svds!(X,
         for iterc=1:dineofmaxiter
             #@show svdmeth,filter,filterintensity
 			# SVD decomposition on a full matrix with some parameters
-            SVU,SVS,SVV,ncon,nit=DINEOF_svd(X,min(iloop,ncmax),svdmeth,svdtol;filter=filter,filterintensity=filterintensity,filterrepetitions=filterrepetitions)
+            SVU,SVS,SVV,ncon,nit=DINEOF_svd(X,min(iloop,ncmax),svdmeth,svdtol;tfilter=tfilter,filterintensity=filterintensity,filterrepetitions=filterrepetitions)
 
             # Check if the standard SVD decomposition worked out (basically if the matrix was not ill behaved)
             if ncon!=min(iloop,ncmax)
@@ -260,7 +260,7 @@ function DINEOF_svds!(X,
 
     for iterc=1:dineofmaxiter
     varchange=0
-        SVU,SVS,SVV,ncon,nit=DINEOF_svd(X,min(ibest,ncmax),svdmeth,svdtol;filter=filter,filterintensity=filterintensity,filterrepetitions=filterrepetitions)
+        SVU,SVS,SVV,ncon,nit=DINEOF_svd(X,min(ibest,ncmax),svdmeth,svdtol;tfilter=tfilter,filterintensity=filterintensity,filterrepetitions=filterrepetitions)
 
 
 

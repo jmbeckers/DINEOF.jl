@@ -43,21 +43,25 @@ N=size(X)[2]
 NE=size(S)[1]
 
 #X[isnan.(X)].= 0.0
-U[isnan.(U)].= 0.0
+#U[isnan.(U)].= 0.0
 
 myrefm=mean(XR[.!isnan.(XR)])
 @show myrefm,size(X),size(U)
 
 data=zeros(Float64,M)
-XOI=zeros(Float64,size(X))
+XOI=zeros(Float64,(prod(size(UR)[1:end-1]),size(jlist)[1]))
+
+#@show size(XOI)
 
 L=U*diagm(S)/sqrt(N)
 
+L[isnan.(L)].= 0.0
 @show jlist
-
+ij=0
 for j in jlist
   
-		
+		#@show j
+		ij=ij+1
   
 		ipresent=.!isnan.(X[:,j])
 		
@@ -66,12 +70,15 @@ for j in jlist
         invAAU=inv(AA.U)
         BB=L*invAAU
         data.=0.0
+		#myrefm=mean(X[ipresent,j])
 		data[ipresent]=X[ipresent,j].-myrefm
-		XOI[:,j]=BB*(BB'*data).+myrefm
+		
+		XOI[:,ij]=BB*(BB'*data).+myrefm
+		XOI[isnan.(U[:,1]),ij].=NaN
 
 end
 @show mean(XOI[.!isnan.(XOI)])
 
-return reshape(XOI,size(XR))
+return reshape(XOI,(size(XR)[1:end-1]...,size(XOI)[end]...))
 
 end

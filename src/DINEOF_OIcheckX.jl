@@ -47,6 +47,7 @@ for j in jlist
         invAAU=inv(AA.U)
         BB=L*invAAU
         data.=0.0
+		
 		data[ipresent]=X[ipresent,j]
 		# Normally the OI project is L*invAUU*invAUU*L'*data and to be compared to U S V' which is U S/sqrt(N) *invAUU * BB'*data - U S V 
 		XD=S.*(invAAU*BB'*data/sqrt(N) - V[j,:])

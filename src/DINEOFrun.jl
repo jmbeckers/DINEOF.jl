@@ -18,7 +18,7 @@
 	dineoftol=0.001,
 	svdmeth="svd",
 	svdtol=0.000001,
-	filter="None",
+	tfilter="None",
 	filterintensity=1.0,
 	filterrepetitions=1)
 
@@ -66,7 +66,7 @@ Provides a DINEOF reconstruction of an N-dimensional array `X`. Missing points a
 
 *	`svdtol=0.000001` : tolerance during svd decomposition of filled matrix (svds or eig)
 
-*	`filter="None"` : filter to be applied to dimension 2. Note that this is the dimension in the innermost svd decomposition which might be dimension 1 of the outermost call since a transpose is performed if M<N
+*	`tfilter="None"` : filter to be applied to dimension 2. Note that this is the dimension in the innermost svd decomposition which might be dimension 1 of the outermost call since a transpose is performed if M<N
 
 *	`filterintensity=1.0` : filter intensity
 
@@ -109,7 +109,7 @@ function DINEOFrun(X,whichgroups=[ones(Int32,ndims(X)-1)...,2];
 	dineoftol=0.005,
 	svdmeth="svd",
 	svdtol=0.000001,
-	filter="None",
+	tfilter="None",
 	filterintensity=1.0,
 	filterrepetitions=1)
 	
@@ -305,7 +305,7 @@ function DINEOFrun(X,whichgroups=[ones(Int32,ndims(X)-1)...,2];
 	dineoftol=dineoftol,
 	svdmeth=svdmeth,
 	svdtol=svdtol,
-	filter=filter,
+	tfilter=tfilter,
 	filterintensity=filterintensity,
 	filterrepetitions=filterrepetitions)
 	# Decide here on musquare, error maps and QC estimators
