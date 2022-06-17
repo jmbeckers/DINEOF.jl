@@ -284,6 +284,7 @@ function DINEOF_svds!(X,
         cvbest=cvbest/size(crossvalidation)[1]
         cv=cv./size(crossvalidation)[1]
     end
+	println("=========================================================================================")
     println("Cross validation value (root mean squared misfit): $(sqrt(cvbest)) for $ibest EOFs")
     #@show cv[1:iloop]
 	########################################################################
@@ -322,6 +323,6 @@ function DINEOF_svds!(X,
     # maybe add musquare to output parameters ? replace cvbest by [cvbest,musquare ].... whatever since for the moment cvbest was never used
 	#
     ###########################################################################
-
+    println("=========================================================================================")
     return SVU,SVS,SVV,cvbest,cv[1:iloop],musquare
 end
