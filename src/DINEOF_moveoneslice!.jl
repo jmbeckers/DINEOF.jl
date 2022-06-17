@@ -21,6 +21,7 @@ minimumcoverage=(0.1, 0.1),
 	filterintensity=1.0,
 	filterrepetitions=1)
 
+@show size(S),S,"in"
 
 
 if size(whichgroups)[1]!=ndims(XR)
@@ -62,9 +63,12 @@ XA[:,end].=newsliceoi
 
 
 
-@show size(X)
+
+
+
+
 # DINEOFrun with restart XA and one EOF less than previous one and limit to one more EOF then previous one
-XAN,offset,U,S,V,cvEOF,cvarray,errmap,musquare=DINEOFrun(X;
+XAN,offset,Uout,Sout,Vout,cvEOF,cvarray,errmap,muout=DINEOFrun(XR;
 	minimumcoverage=minimumcoverage,
 	cvmask=cvmask,
 	cvfraction=cvfraction,
@@ -73,7 +77,7 @@ XAN,offset,U,S,V,cvEOF,cvarray,errmap,musquare=DINEOFrun(X;
 	dimensionsforcopy=dimensionsforcopy,
 	errormap=errormap,
 	musquare=musquare,
-	restart=XA,
+	restart=XF,
     keepsvdcvrestart=keepsvdcvrestart,
 	eofmax=eofmax,
 	eofstart=eofstart,
@@ -86,19 +90,20 @@ XAN,offset,U,S,V,cvEOF,cvarray,errmap,musquare=DINEOFrun(X;
 	filterrepetitions=filterrepetitions)
 
 # Once reconstructed, weighted average between old reconstruction and new reconstrucion. Weighting with a linear ramp ? So newest image mostly by corrent reconstrucion while older images basicall untouched by new reconstruction?
-@show size(X),size(XAN)
+@show size(XR),size(XAN)
 
+XAN=reshape(XAN,(prod(size(XAN)[1:end-1]),size(XAN)[end]))
 
 for j=1:N
     w=j/N
 	#@show w
-	#XA[:,j].= w*XAN[:,j] .+ (1-w)*XA[:,j]
-	XA[:,j].=XAN[:,j]
+	XA[:,j].= w*XAN[:,j] .+ (1-w)*XA[:,j]
+	#XA[:,j].=XAN[:,j]
 end
 
-
+@show size(S),S
 # Saving is left to the calling routine but probably the  oldest image has the best estimate (most data used) 
 
-return errmap,V,cvEOF,cvarray
+return offset,Uout,Sout,Vout,cvEOF,cvarray,errmap,muout
 
 end

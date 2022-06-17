@@ -73,8 +73,8 @@ function DINEOF_cvmask(X,coverage=0.01;cvmethod="Random",maxbubblesize=max.(20,0
         I1 = oneunit(Ifirst)
         #@show I1
         while cvdone<cvpoints
-		@show cvdone,cvpoints
-		flush(stdout)
+		#@show cvdone,cvpoints
+		#flush(stdout)
             position=mod(rand(Int),M)+1
             #@show CartesianIndices(X)[position]
             I=CartesianIndices(X)[position]
