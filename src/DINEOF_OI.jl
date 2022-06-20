@@ -46,7 +46,7 @@ NE=size(S)[1]
 #U[isnan.(U)].= 0.0
 
 myrefm=mean(XR[.!isnan.(XR)])
-@show myrefm,size(X),size(U)
+#@show myrefm,size(X),size(U)
 
 data=zeros(Float64,M)
 XOI=zeros(Float64,(prod(size(UR)[1:end-1]),size(jlist)[1]))
@@ -56,7 +56,7 @@ XOI=zeros(Float64,(prod(size(UR)[1:end-1]),size(jlist)[1]))
 L=U*diagm(S)/sqrt(N)
 
 L[isnan.(L)].= 0.0
-@show jlist
+#@show jlist
 ij=0
 for j in jlist
   
@@ -77,7 +77,7 @@ for j in jlist
 		XOI[isnan.(U[:,1]),ij].=NaN
 
 end
-@show mean(XOI[.!isnan.(XOI)])
+#@show mean(XOI[.!isnan.(XOI)])
 
 return reshape(XOI,(size(XR)[1:end-1]...,size(XOI)[end]...))
 

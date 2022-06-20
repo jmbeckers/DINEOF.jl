@@ -73,6 +73,7 @@ function DINEOF_cvmask(X,coverage=0.01;cvmethod="Random",maxbubblesize=max.(20,0
         I1 = oneunit(Ifirst)
         #@show I1
         while cvdone<cvpoints
+		# 
 		#@show cvdone,cvpoints
 		#flush(stdout)
             position=mod(rand(Int),M)+1
@@ -135,11 +136,18 @@ function DINEOF_cvmask(X,coverage=0.01;cvmethod="Random",maxbubblesize=max.(20,0
             indt=[(groups[j] == 1 ? (myt[j]) : (:)) for j = 1:n]
 
             #@show indf,indt
+			# Add here a test if isnan.(X[indf...]) will pass the threshold, during scene elimination, otherwise one will loose too many scences
+			#
+			absent=sum(isnan.(X[indf...]))
+			present=sum(.!isnan.(X[indf...]))
+			
+			if present>coverage*(absent+present)
   
             cvmask[indt...]=cvmask[indt...] .| isnan.(X[indf...])
             cvmask[isnan.(X)].=false
             cvdone=sum(cvmask)
             ntimes=ntimes+1
+			end
             if ntimes>maximumiterations
                 @warn("requested number of cv points not reached, maybe not enough missing points to start with; will continue though")
                 break

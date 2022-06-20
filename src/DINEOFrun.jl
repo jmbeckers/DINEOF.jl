@@ -92,18 +92,18 @@ Provides a DINEOF reconstruction of an N-dimensional array `X`. Missing points a
 * `musquare` : the value of mu^2 used for the OI interpretation leading to error maps
 
 """
-function DINEOFrun(X,whichgroups=[ones(Int32,ndims(X)-1)...,2];
+function DINEOFrun(Xin,whichgroups=[ones(Int32,ndims(Xin)-1)...,2];
 	minimumcoverage=(0.1, 0.1),
 	cvmask="Automatic",
 	cvfraction=0.01,
 	cvmethod="Random",
-	maxbubblesize=max.(20,0.01*[size(X)...]),
-	dimensionsforcopy=[zeros(Int32,ndims(X)-1)...,1],
+	maxbubblesize=max.(20,0.01*[size(Xin)...]),
+	dimensionsforcopy=[zeros(Int32,ndims(Xin)-1)...,1],
 	errormap=true,
 	musquare=0,
 	restart=[],
     keepsvdcvrestart=true,
-	eofmax=size(X)[2]-1,
+	eofmax=size(Xin)[2]-1,
 	eofstart=1,
 	dineofmaxiter=15,
 	dineoftol=0.005,
@@ -113,7 +113,7 @@ function DINEOFrun(X,whichgroups=[ones(Int32,ndims(X)-1)...,2];
 	filterintensity=1.0,
 	filterrepetitions=1)
 	
-	
+	X=deepcopy(Xin)
 	
     # X ND array with NaN at missing locations
     # whichgroups: array of 1 and 2 indicating which dimensions are collapsed together. eg [1 2 1 2] regroups dimensions 
@@ -148,19 +148,25 @@ function DINEOFrun(X,whichgroups=[ones(Int32,ndims(X)-1)...,2];
         
     else
         #@show size(cvmask),size(X)
+		if cvmask!="None"
         if size(cvmask)!=size(X)
             @error("Mask for cross validation and size of X do not correspond")
 			@show size(X),size(cvmask)
             return
         end
 		println("Using cvmask provided")
+		else
+		println("No CV")
+		end
+		
     end
     
+	if cvmask!="None"
     # Do not use cross validation in already missing points
     cvmask[isnan.(X)].=false
 	
 	println("Number of data points before elimination of low coverage regions is $(sum(.!isnan.(X))) and cv fraction $(sum(cvmask)/sum(.!isnan.(X)))")
-	
+	end
     
     if size(whichgroups)[1]!=ndims(X)
         @error("Incompatible dimensions in whichgroups")
@@ -180,7 +186,15 @@ function DINEOFrun(X,whichgroups=[ones(Int32,ndims(X)-1)...,2];
     #@show size(X)[perminput]
     sizeperminput=size(X)[perminput]
     X2D=reshape(permutedims(X,perminput),newsize)
+	
+	
+	if cvmask=="None"
+	cv2D=reshape(permutedims(falses(size(X)),perminput),newsize)
+	else
     cv2D=reshape(permutedims(cvmask,perminput),newsize)
+	end
+	
+	
 	if restart!=[]
 	    println("Using restart matrix")
 		restart2D=reshape(permutedims(restart,perminput),newsize)
@@ -327,7 +341,7 @@ function DINEOFrun(X,whichgroups=[ones(Int32,ndims(X)-1)...,2];
 	
 	if errormap
 		errmap=DINEOF_errormap(U,S,V,musquare,missingvalues)
-		println("Mean error variance of reconstruction: $(mean(errmap)) ")
+		println("Final Error Map with mean error variance of reconstruction: $(mean(errmap)) ")
 	end
 	
 	#

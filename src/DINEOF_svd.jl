@@ -64,10 +64,15 @@ function DINEOF_svd(X,nele,svdmeth="svd",svdtol=0.00001;tfilter="None",filterint
         
         end
         
-            SV,ncon,nit=svds(X;nsv=nele,tol=svdtol)[1:3]
-              SVS=SV.S
-              SVV=SV.V
-              SVU=SV.U
+            #SV,ncon,nit=svds(X;nsv=nele,tol=svdtol)[1:3]
+            #  SVS=SV.S
+            #  SVV=SV.V
+            #  SVU=SV.U
+			
+			  SVU, SVS, SVV = tsvd(X, nele)
+			  ncon=nele
+			  nit=9999
+			  
     end
     if svdmeth=="eig"
         BB=X'*X

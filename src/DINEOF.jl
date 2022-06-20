@@ -5,6 +5,7 @@ using Arpack
 using Statistics
 using Random
 using Optim
+using TSVD
 
 include("DINEOF_svd.jl")
 export DINEOF_svd

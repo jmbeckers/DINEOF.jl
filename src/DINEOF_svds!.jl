@@ -105,7 +105,7 @@ function DINEOF_svds!(X,
     # Changes X !!!!
     # To get the filtered matrix, use the output to calculate USV'
 
-	println("svds! matrix size: $(size(X))")
+	#println("svds! matrix size: $(size(X))")
 
     varmatrix=var(X)
 	meanmatrix=mean(X)
@@ -129,7 +129,7 @@ function DINEOF_svds!(X,
 
 
     #@show varmatrix,meanmatrix,varmatrixp,varmatrixm
-    if meanmatrix^2>0.0001*varmatrix
+    if meanmatrix^2>0.001*varmatrix
         @warn("You should subtract a mean value from your data")
     end
     # cross validation
@@ -214,7 +214,7 @@ function DINEOF_svds!(X,
         end
         #@show cvval
 		tutu=cvval/max(1,size(crossvalidation)[1])
-		println("Eof loop $(iloop) with root mean squared misfit: $(sqrt(tutu)) ")
+		println("Eof loop $(iloop) with rms cv misfit: $(sqrt(tutu)) ")
         cv[iloop]=cvval
         # Avoid too flat cross validation curve near minimum and only accept "significant decrease"
         if cvval-cvbest<=-0.0001*cvbest
@@ -283,9 +283,10 @@ function DINEOF_svds!(X,
 	#@show cvbest
         cvbest=cvbest/size(crossvalidation)[1]
         cv=cv./size(crossvalidation)[1]
-    end
+    end 
+	println("Cross validation value (root mean squared misfit): $(sqrt(cvbest)) for $ibest EOFs")
 	println("=========================================================================================")
-    println("Cross validation value (root mean squared misfit): $(sqrt(cvbest)) for $ibest EOFs")
+   
     #@show cv[1:iloop]
 	########################################################################
 	# To work on
