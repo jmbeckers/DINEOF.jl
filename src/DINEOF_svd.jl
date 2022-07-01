@@ -38,7 +38,7 @@ filterrepetitions defines how many diffusion-like steps are used (so how wide th
 
 """
 function DINEOF_svd(X,nele,svdmeth="svd",svdtol=0.00001;tfilter="None",filterintensity=1.0,filterrepetitions=1)
-    
+    #X=deepcopy(Xin)
     
     if svdmeth=="svd"
         if tfilter=="pmf"
@@ -63,15 +63,15 @@ function DINEOF_svd(X,nele,svdmeth="svd",svdtol=0.00001;tfilter="None",filterint
            X=X*FF^filterrepetitions
         
         end
-        
-            #SV,ncon,nit=svds(X;nsv=nele,tol=svdtol)[1:3]
-            #  SVS=SV.S
-            #  SVV=SV.V
-            #  SVU=SV.U
+        nel=min(nele,size(X)[2])
+            SV,ncon,nit=svds(X;nsv=nel,tol=svdtol)[1:3]
+              SVS=SV.S
+              SVV=SV.V
+             SVU=SV.U
 			
-			  SVU, SVS, SVV = tsvd(X, nele)
-			  ncon=nele
-			  nit=9999
+			 # SVU, SVS, SVV = tsvd(X, nele)
+			 # ncon=nele
+			 # nit=9999
 			  
     end
     if svdmeth=="eig"

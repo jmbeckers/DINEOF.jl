@@ -325,10 +325,13 @@ function DINEOFrun(Xin,whichgroups=[ones(Int32,ndims(Xin)-1)...,2];
 	# Decide here on musquare, error maps and QC estimators
 	# Get it back from svds and finetune with DINEOF_musquare around-way above the proposed value (inflation)
 	
+	@show "finished"
+	@show musquare
+	flush(stdout)
 	if musquare==0
-		
+		if cvmask!="None"
 		musquare,cvopt=DINEOF_musquare(X2D,U,S,V,missingvalues,cvpoints,cva;musquarer=[0.5*musquareestimate,100*musquareestimate])[1:2]
-		
+		end
 		
 		
 		
@@ -403,6 +406,8 @@ function DINEOFrun(Xin,whichgroups=[ones(Int32,ndims(Xin)-1)...,2];
     errmap=A
     end
 	
+	@show musquare
+	flush(stdout)
     #@show "here"
     
     #U=DINEOF_insertNaNr(U,rlow)

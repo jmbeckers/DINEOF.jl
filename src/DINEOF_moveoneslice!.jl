@@ -12,7 +12,7 @@ minimumcoverage=(0.1, 0.1),
 	restart=[],
     keepsvdcvrestart=true,
 	eofmax=min(size(S)[1]+1,size(XF)[end]),
-	eofstart=max(size(S)[1]-1,1),
+	eofstart=max(size(S)[1]-25,min(3,eofmax)),
 	dineofmaxiter=15,
 	dineoftol=0.005,
 	svdmeth="svd",
@@ -81,6 +81,7 @@ XAN,offset,Uout,Sout,Vout,cvEOF,cvarray,errmap,muout=DINEOFrun(XR;
 	errormap=errormap,
 	musquare=musquare,
 	restart=XF,
+	#restart=[],
     keepsvdcvrestart=keepsvdcvrestart,
 	eofmax=eofmax,
 	eofstart=eofstart,
@@ -97,6 +98,8 @@ XAN,offset,Uout,Sout,Vout,cvEOF,cvarray,errmap,muout=DINEOFrun(XR;
 
 XAN=reshape(XAN,(prod(size(XAN)[1:end-1]),size(XAN)[end]))
 
+@show N
+	flush(stdout)
 for j=1:N
     w=j/N
 	#@show w
@@ -104,7 +107,7 @@ for j=1:N
 	#XA[:,j].=XAN[:,j]
 end
 
-#@show size(S),S
+@show size(Sout)
 # Saving is left to the calling routine but probably the  oldest image has the best estimate (most data used) 
 
 
